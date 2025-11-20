@@ -1,0 +1,45 @@
+.root {
+    -fx-background-color: #181C21;
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.label, .text-input, .password-field, .combo-box {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+}
+
+.button {
+    -fx-background-color: #55B4F3;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 7;
+    -fx-padding: 8 24 8 24;
+}
+
+.combo-box, .text-field, .password-field {
+    -fx-background-color: #222831;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: #55B4F3;
+    -fx-border-radius: 7;
+    -fx-font-size: 16px;
+}
+
+.list-cell {
+    -fx-background-color: #181C21;
+    -fx-text-fill: #ffffff;
+}
+
+.label.title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #55B4F3;
+    -fx-padding: 0 0 20 0;
+}
+
+.label.banner {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-padding: 18 0 18 0;
+}
