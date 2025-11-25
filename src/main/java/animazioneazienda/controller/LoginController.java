@@ -3,6 +3,8 @@ package animazioneazienda.controller;
 import animazioneazienda.bean.Utente;
 import animazioneazienda.dao.UtenteDAO;
 
+import java.sql.Date;
+
 public class LoginController {
     private final UtenteDAO utenteDAO;
 
@@ -10,46 +12,30 @@ public class LoginController {
         this.utenteDAO = utenteDAO;
     }
 
-    /**
-     * Registra un nuovo utente (Superadmin, Animatore, Amministratore)
-     * @return true se la registrazione è OK
-     */
-    public boolean registraUtente(String email, String password, Utente.Ruolo ruolo, int aziendaId) {
-        if (utenteDAO == null) return false;
-        if (email == null || password == null || ruolo == null || aziendaId <= 0) return false;
-        try {
-            Utente nuovo = new Utente();
-            nuovo.setEmail(email);
-            nuovo.setPassword(password);
-            nuovo.setRuolo(ruolo);
-            nuovo.setAziendaId(aziendaId);
-            return utenteDAO.insertUtente(nuovo);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Login: restituisce l'utente trovato, null se dati invalidi.
-     */
     public Utente doLoginReturnUtente(String email, String password) {
         try {
-            Utente utente = utenteDAO.findByEmailAndPassword(email, password);
-            return utente;
+            return utenteDAO.findByEmailAndPassword(email, password);
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
 
-    /**
-     * True se esiste almeno 1 superadmin nel sistema
-     */
     public boolean esisteSuperadmin() {
         try {
             return utenteDAO.contaSuperadmin() > 0;
         } catch (Exception e) {
+            return false;
+        }
+    }
+
+    // REGISTRA UTENTE: tutti dati, incluso ruolo e aziendaId
+    public boolean registraUtente(String nome, String cognome, Date dataNascita, String sesso,
+                                  String email, String password, String nomeAzienda, Utente.Ruolo ruolo, int aziendaId) {
+        try {
+            Utente utente = new Utente(email, password, ruolo, aziendaId, nomeAzienda, nome, cognome, sesso, dataNascita);
+            return utenteDAO.insertUtente(utente);
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

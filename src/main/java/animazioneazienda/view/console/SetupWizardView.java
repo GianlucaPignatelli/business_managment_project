@@ -33,7 +33,9 @@ public class SetupWizardView {
 
             boolean res = false;
             try {
-                res = utenteDAO.insertUtente(new Utente(email, pw, Utente.Ruolo.SUPERADMIN, aziendaId, nomeAzienda));
+                res = utenteDAO.insertUtente(
+                        new Utente(email, pw, Utente.Ruolo.SUPERADMIN, aziendaId, nomeAzienda)
+                );
             } catch (SQLException ex) {
                 System.out.println("Errore registrazione SUPERADMIN: " + ex.getMessage());
             }

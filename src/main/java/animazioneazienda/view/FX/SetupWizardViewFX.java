@@ -1,69 +1,81 @@
 package animazioneazienda.view.FX;
 
+import animazioneazienda.dao.AziendaDAO;
+import animazioneazienda.dao.UtenteDAO;
 import animazioneazienda.bean.Utente;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class SetupWizardViewFX {
-    public void start(Stage stage) {
-        stage.setTitle("Setup Iniziale Applicazione");
+    private final AziendaDAO aziendaDAO;
+    private final UtenteDAO utenteDAO;
 
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(15));
-        grid.setVgap(10);
-        grid.setHgap(10);
+    public SetupWizardViewFX(AziendaDAO aziendaDAO, UtenteDAO utenteDAO) {
+        this.aziendaDAO = aziendaDAO;
+        this.utenteDAO = utenteDAO;
+    }
 
-        Label aziendaLabel = new Label("Nome prima azienda:");
-        TextField aziendaField = new TextField();
-        grid.add(aziendaLabel, 0, 0);
-        grid.add(aziendaField, 1, 0);
+    public void mostraWizard(Stage primaryStage) {
+        VBox root = new VBox(20);
+        root.setStyle("-fx-background-color: #181818; -fx-padding: 40; -fx-alignment: center;");
 
-        Label emailLabel = new Label("Email SUPERADMIN:");
+        Label titolo = new Label("Setup Iniziale Applicazione");
+        titolo.setFont(Font.font("Arial", 30));
+        titolo.setStyle("-fx-text-fill: #1CA9E2;");
+
+        TextField nomeAziendaField = new TextField();
+        nomeAziendaField.setPromptText("Nome Azienda");
+        nomeAziendaField.setMaxWidth(320);
+
         TextField emailField = new TextField();
-        grid.add(emailLabel, 0, 1);
-        grid.add(emailField, 1, 1);
+        emailField.setPromptText("Email Superadmin");
+        emailField.setMaxWidth(320);
 
-        Label pwLabel = new Label("Password SUPERADMIN:");
         PasswordField pwField = new PasswordField();
-        grid.add(pwLabel, 0, 2);
-        grid.add(pwField, 1, 2);
+        pwField.setPromptText("Password Superadmin");
+        pwField.setMaxWidth(320);
 
-        Button btn = new Button("Crea e Avvia Gestionale");
-        Label message = new Label();
-        grid.add(btn, 1, 3);
-        grid.add(message, 1, 4);
+        Button creaBtn = new Button("Crea Superadmin e Azienda");
+        creaBtn.setStyle("-fx-font-size: 19px; -fx-background-color: #1CA9E2; -fx-text-fill: #181818;");
+        creaBtn.setMaxWidth(250);
 
-        btn.setOnAction(ev -> {
-            String aziendaNome = aziendaField.getText().trim();
+        Label messageLabel = new Label("");
+        messageLabel.setStyle("-fx-text-fill: #1CA9E2;");
+
+        root.getChildren().addAll(titolo, nomeAziendaField, emailField, pwField, creaBtn, messageLabel);
+
+        creaBtn.setOnAction(ev -> {
+            String nomeAzienda = nomeAziendaField.getText().trim();
             String email = emailField.getText().trim();
-            String password = pwField.getText();
+            String pw = pwField.getText().trim();
 
-            if (aziendaNome.isEmpty() || email.isEmpty() || password.isEmpty()) {
-                message.setText("Compila tutti i campi!");
+            if (nomeAzienda.isEmpty() || email.isEmpty() || pw.isEmpty()) {
+                messageLabel.setText("Compila tutti i campi!");
                 return;
             }
-
             try {
-                int aziendaId = FXContextHolder.aziendaDAO.registraAzienda(aziendaNome);
+                int aziendaId = aziendaDAO.registraAzienda(nomeAzienda);
                 if (aziendaId <= 0) throw new Exception("Errore creazione azienda");
-
-                boolean res = FXContextHolder.loginController.registraUtente(email, password, Utente.Ruolo.SUPERADMIN, aziendaId);
+                boolean res = utenteDAO.insertUtente(
+                        new Utente(email, pw, Utente.Ruolo.SUPERADMIN, aziendaId, nomeAzienda)
+                );
                 if (res) {
-                    message.setText("Setup completato. Riavvia l'applicazione!");
-                    btn.setDisable(true);
+                    messageLabel.setText("Setup completato! Superadmin e azienda creati.");
                 } else {
-                    message.setText("Errore registrazione SUPERADMIN!");
+                    messageLabel.setText("Errore registrazione superadmin!");
                 }
             } catch (Exception e) {
-                message.setText("Errore: " + e.getMessage());
+                messageLabel.setText("Setup fallito: " + e.getMessage());
             }
         });
 
-        Scene scene = new Scene(grid, 450, 230);
-        stage.setScene(scene);
-        stage.show();
+        Scene scene = new Scene(root, 700, 480);
+        primaryStage.setScene(scene);
+        primaryStage.setTitle("Setup Wizard FX");
+        primaryStage.show();
+        primaryStage.centerOnScreen();
     }
 }

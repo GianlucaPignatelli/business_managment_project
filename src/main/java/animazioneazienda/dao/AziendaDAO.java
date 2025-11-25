@@ -72,15 +72,14 @@ public class AziendaDAO {
     }
 
     public int findIdByNome(String nomeAzienda) throws SQLException {
-        String query = "SELECT id FROM aziende WHERE nome = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+        String sql = "SELECT id FROM aziende WHERE nome = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, nomeAzienda);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt("id");
-            } else {
-                return -1;
             }
         }
+        return -1; // Azienda non trovata
     }
 }

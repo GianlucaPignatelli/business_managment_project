@@ -8,16 +8,13 @@ import animazioneazienda.dao.animatore.OffertaLavoroDAO;
 import animazioneazienda.controller.LoginController;
 import animazioneazienda.bean.Utente;
 import animazioneazienda.bean.Azienda;
-// Parte console
 import animazioneazienda.view.console.AziendaView;
 import animazioneazienda.view.console.LoginView;
 import animazioneazienda.view.console.SetupWizardView;
 import animazioneazienda.view.console.SuperadminConsoleMenu;
 import animazioneazienda.view.console.amministratore.AdminMenuConsoleView;
 import animazioneazienda.view.console.animatore.AnimatoreMenuView;
-// Parte FX
 import animazioneazienda.view.FX.EntryPointViewFX;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Scanner;
