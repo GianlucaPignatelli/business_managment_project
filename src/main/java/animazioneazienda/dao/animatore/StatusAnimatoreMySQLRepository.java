@@ -1,16 +1,19 @@
 package animazioneazienda.dao.animatore;
 
 import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.exception.DaoException;
+
 import java.sql.*;
 
-public class StatusAnimatoreDAO {
+public class StatusAnimatoreMySQLRepository implements StatusAnimatoreRepository {
     private final Connection conn;
 
-    public StatusAnimatoreDAO(Connection conn) {
+    public StatusAnimatoreMySQLRepository(Connection conn) {
         this.conn = conn;
     }
 
-    public StatusAnimatore findByAnimatore(int aziendaId, int animatoreId) throws SQLException {
+    @Override
+    public StatusAnimatore findByAnimatore(int aziendaId, int animatoreId) throws DaoException {
         String query = "SELECT * FROM status_animatore WHERE azienda_id=? AND animatore_id=?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, aziendaId);
@@ -24,16 +27,18 @@ public class StatusAnimatoreDAO {
                 s.setDimensioneAuto(rs.getString("dimensione_auto"));
                 s.setLavoriAccettati(rs.getString("lavori_accettati"));
                 s.setStato(rs.getString("stato"));
-                s.setHaccp(rs.getBoolean("haccp")); // FIX: recuperi il campo HACCP
+                s.setHaccp(rs.getBoolean("haccp"));
                 return s;
             } else {
                 return null;
             }
+        } catch (SQLException e) {
+            throw new DaoException("Errore MySQL nel findByAnimatore", e);
         }
     }
 
-    public boolean insertOrUpdate(StatusAnimatore s) throws SQLException {
-        // FISSA QUERY: aggiungi campo haccp
+    @Override
+    public boolean insertOrUpdate(StatusAnimatore s) throws DaoException {
         String query = "REPLACE INTO status_animatore (animatore_id, azienda_id, modello_auto, dimensione_auto, lavori_accettati, stato, haccp) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, s.getAnimatoreId());
@@ -42,8 +47,10 @@ public class StatusAnimatoreDAO {
             stmt.setString(4, s.getDimensioneAuto());
             stmt.setString(5, s.getLavoriAccettati());
             stmt.setString(6, s.getStato());
-            stmt.setBoolean(7, s.isHaccp()); // FIX: salva il campo HACCP
+            stmt.setBoolean(7, s.isHaccp());
             return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DaoException("Errore MySQL nel insertOrUpdate", e);
         }
     }
 }

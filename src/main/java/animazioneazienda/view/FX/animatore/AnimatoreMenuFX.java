@@ -1,7 +1,11 @@
 package animazioneazienda.view.FX.animatore;
 
 import animazioneazienda.bean.Utente;
+import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
 import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
+import animazioneazienda.view.FX.EntryPointViewFX;
+import animazioneazienda.view.FX.animatore.disponibilita.CalendarioDisponibilitaViewFX;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -35,35 +39,32 @@ public class AnimatoreMenuFX {
         titleLabel.setFont(Font.font("Arial", 28));
         titleLabel.setTextFill(Color.web("#1CA9E2"));
 
-        // Status Animatore con icona man.png
         ImageView manIcon = new ImageView(new Image(getClass().getResourceAsStream("/man.png")));
         manIcon.setFitHeight(22); manIcon.setFitWidth(22);
-
         Button statusBtn = new Button("Status Animatore", manIcon);
+        statusBtn.setGraphicTextGap(12);
         statusBtn.setStyle("-fx-font-size: 18px; -fx-background-color: #1CA9E2; -fx-text-fill: #181818;");
         statusBtn.setMaxWidth(320);
 
-        // Offerte con icona notification.png
         ImageView notificationIcon = new ImageView(new Image(getClass().getResourceAsStream("/notification.png")));
         notificationIcon.setFitHeight(22); notificationIcon.setFitWidth(22);
         Button offerteBtn = new Button("Visualizza Offerte", notificationIcon);
+        offerteBtn.setGraphicTextGap(12);
         offerteBtn.setStyle("-fx-font-size: 18px; -fx-background-color: #1CA9E2; -fx-text-fill: #181818;");
         offerteBtn.setMaxWidth(320);
 
-        // Disponibilità con icona calendar.png
         ImageView calendarIcon = new ImageView(new Image(getClass().getResourceAsStream("/calendar.png")));
         calendarIcon.setFitHeight(22); calendarIcon.setFitWidth(22);
         Button disponibilitaBtn = new Button("Gestisci Disponibilità", calendarIcon);
+        disponibilitaBtn.setGraphicTextGap(12);
         disponibilitaBtn.setStyle("-fx-font-size: 18px; -fx-background-color: #1CA9E2; -fx-text-fill: #181818;");
         disponibilitaBtn.setMaxWidth(320);
 
-        // Bottone indietro centrato con icona
         ImageView backIcon = new ImageView(new Image(getClass().getResourceAsStream("/left_arrow.png")));
         backIcon.setFitHeight(26); backIcon.setFitWidth(26);
         Button indietroBtn = new Button("", backIcon);
         indietroBtn.setStyle("-fx-background-color: transparent;");
         indietroBtn.setMinSize(40, 40);
-
         HBox boxIndietro = new HBox(indietroBtn);
         boxIndietro.setAlignment(Pos.CENTER);
         boxIndietro.setPadding(new Insets(16, 0, 0, 0));
@@ -77,7 +78,8 @@ public class AnimatoreMenuFX {
         );
 
         statusBtn.setOnAction(ev -> {
-            AnimatoreStatusViewFX statusView = new AnimatoreStatusViewFX(primaryStage, utente);
+            StatusAnimatoreDAO statusDAO = animazioneazienda.view.FX.EntryPointViewFX.statusAnimatoreDAO;
+            AnimatoreStatusViewFX statusView = new AnimatoreStatusViewFX(primaryStage, utente, statusDAO);
             statusView.show();
         });
 
@@ -88,7 +90,8 @@ public class AnimatoreMenuFX {
         });
 
         disponibilitaBtn.setOnAction(ev -> {
-            CalendarioDisponibilitaViewFX disponibilitaView = new CalendarioDisponibilitaViewFX(primaryStage, utente);
+            DisponibilitaAnimatoreDAO disponibilitaDAO = EntryPointViewFX.disponibilitaAnimatoreDAO;
+            CalendarioDisponibilitaViewFX disponibilitaView = new CalendarioDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO);
             disponibilitaView.show();
         });
 

@@ -4,14 +4,13 @@ public class StatusAnimatore {
     private int animatoreId;
     private int aziendaId;
     private String modelloAuto;
-    private String dimensioneAuto; // es: piccola/media/grande/furgone
-    private String lavoriAccettati; // semplice stringa CSV
-    private String stato; // es: Disponibile, Non operativo, etc
-    private boolean haccp; // certificazione per uso carretti
+    private String dimensioneAuto;
+    private String lavoriAccettati;
+    private String stato;
+    private boolean haccp;
 
     public StatusAnimatore() {}
 
-    // Getters e Setters
     public int getAnimatoreId() { return animatoreId; }
     public void setAnimatoreId(int animatoreId) { this.animatoreId = animatoreId; }
     public int getAziendaId() { return aziendaId; }

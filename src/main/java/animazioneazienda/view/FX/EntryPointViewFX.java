@@ -1,5 +1,6 @@
 package animazioneazienda.view.FX;
 
+import animazioneazienda.controller.AnimatoreController;
 import animazioneazienda.controller.LoginController;
 import animazioneazienda.dao.AziendaDAO;
 import animazioneazienda.dao.UtenteDAO;
@@ -25,9 +26,10 @@ public class EntryPointViewFX extends Application {
     public static DisponibilitaAnimatoreDAO disponibilitaAnimatoreDAO;
     public static StatusAnimatoreDAO statusAnimatoreDAO;
     public static OffertaLavoroDAO offertaLavoroDAO;
+    public static AnimatoreController animatoreController;
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage) throws Exception{
         VBox root = new VBox(30);
         root.setStyle("-fx-background-color: #181818; -fx-alignment: center;");
 
