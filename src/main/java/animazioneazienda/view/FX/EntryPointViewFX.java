@@ -4,7 +4,10 @@ import animazioneazienda.controller.AnimatoreController;
 import animazioneazienda.controller.LoginController;
 import animazioneazienda.dao.AziendaDAO;
 import animazioneazienda.dao.UtenteDAO;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
 import animazioneazienda.dao.animatore.OffertaLavoroDAO;
 import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
 import javafx.application.Application;
@@ -23,7 +26,10 @@ public class EntryPointViewFX extends Application {
     public static AziendaDAO aziendaDAO;
     public static UtenteDAO utenteDAO;
     public static LoginController loginController;
-    public static DisponibilitaAnimatoreDAO disponibilitaAnimatoreDAO;
+    public static VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    public static InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
+    public static ModificaDisponibilitaDAO modificaDisponibilitaDAO;
+    public static EliminaDisponibilitaDAO eliminaDisponibilitaDAO;
     public static StatusAnimatoreDAO statusAnimatoreDAO;
     public static OffertaLavoroDAO offertaLavoroDAO;
     public static AnimatoreController animatoreController;
@@ -54,9 +60,6 @@ public class EntryPointViewFX extends Application {
         primaryStage.setMinWidth(900);
         primaryStage.setMinHeight(600);
 
-        // Forza massimizzazione all'avvio (opzionale, commenta se non vuoi)
-        // primaryStage.setMaximized(true);
-
         primaryStage.centerOnScreen();
         primaryStage.show();
 
@@ -67,7 +70,6 @@ public class EntryPointViewFX extends Application {
         pause.play();
     }
 
-    // Metodo per tornare al menu principale da altre schermate
     public static void showMainMenu(Stage primaryStage) {
         MainMenuFX menuFX = new MainMenuFX(primaryStage);
         menuFX.show();

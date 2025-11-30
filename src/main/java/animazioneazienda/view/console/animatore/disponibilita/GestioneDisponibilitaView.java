@@ -1,7 +1,10 @@
 package animazioneazienda.view.console.animatore.disponibilita;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
 
 import java.util.Scanner;
 
@@ -12,11 +15,17 @@ public class GestioneDisponibilitaView {
     private final EliminaDisponibilitaView eliminaView;
     private final Scanner scanner = new Scanner(System.in);
 
-    public GestioneDisponibilitaView(DisponibilitaAnimatoreDAO disponibilitaDAO, Utente animatore) {
-        this.visualizzaView = new VisualizzaDisponibilitaView(disponibilitaDAO, animatore);
-        this.inserisciView = new InserisciDisponibilitaView(disponibilitaDAO, animatore);
-        this.modificaView = new ModificaDisponibilitaView(disponibilitaDAO, animatore);
-        this.eliminaView = new EliminaDisponibilitaView(disponibilitaDAO, animatore);
+    public GestioneDisponibilitaView(
+            VisualizzaDisponibilitaDAO visualizzaDAO,
+            InserisciDisponibilitaDAO inserisciDAO,
+            ModificaDisponibilitaDAO modificaDAO,
+            EliminaDisponibilitaDAO eliminaDAO,
+            UtenteBean animatore
+    ) {
+        this.visualizzaView = new VisualizzaDisponibilitaView(visualizzaDAO, animatore);
+        this.inserisciView = new InserisciDisponibilitaView(inserisciDAO, visualizzaDAO, animatore);
+        this.modificaView = new ModificaDisponibilitaView(modificaDAO, visualizzaDAO, animatore);
+        this.eliminaView = new EliminaDisponibilitaView(eliminaDAO, visualizzaDAO, animatore);
     }
 
     public void showSottoMenu() {

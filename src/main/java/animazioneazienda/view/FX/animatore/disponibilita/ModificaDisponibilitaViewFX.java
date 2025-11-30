@@ -1,8 +1,10 @@
 package animazioneazienda.view.FX.animatore.disponibilita;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.DisponibilitaAnimatore;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
+import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,13 +23,20 @@ import java.util.List;
 
 public class ModificaDisponibilitaViewFX {
     private final Stage primaryStage;
-    private final Utente utente;
-    private final DisponibilitaAnimatoreDAO disponibilitaDAO;
+    private final UtenteBean utente;
+    private final ModificaDisponibilitaDAO modificaDisponibilitaDAO;
+    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
 
-    public ModificaDisponibilitaViewFX(Stage primaryStage, Utente utente, DisponibilitaAnimatoreDAO disponibilitaDAO) {
+    public ModificaDisponibilitaViewFX(
+            Stage primaryStage,
+            UtenteBean utente,
+            ModificaDisponibilitaDAO modificaDisponibilitaDAO,
+            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO
+    ) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.disponibilitaDAO = disponibilitaDAO;
+        this.modificaDisponibilitaDAO = modificaDisponibilitaDAO;
+        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
     }
 
     public void show() {
@@ -42,18 +51,18 @@ public class ModificaDisponibilitaViewFX {
         ListView<String> dispList = new ListView<>();
         dispList.setStyle("-fx-control-inner-background: #181818; -fx-text-fill: #1CA9E2;");
 
-        List<DisponibilitaAnimatore> lista = disponibilitaDAO.findByAnimatore(utente.getAziendaId(), utente.getId());
-        for (DisponibilitaAnimatore d : lista) {
+        List<DisponibilitaAnimatoreBean> lista = visualizzaDisponibilitaDAO.trovaPerAnimatore(utente.getAziendaId(), utente.getId());
+        for (DisponibilitaAnimatoreBean d : lista) {
             if (d.isTuttoIlGiorno())
                 dispList.getItems().add(d.getData() + " | Tutto il giorno");
             else
-                dispList.getItems().add(String.format("%s | %02d:%02d - %02d:%02d", d.getData(), d.getOrarioInizio().getHour(), d.getOrarioInizio().getMinute(), d.getOrarioFine().getHour(), d.getOrarioFine().getMinute()));
+                dispList.getItems().add(String.format("%s | %02d:%02d - %02d:%02d",
+                        d.getData(), d.getOrarioInizio().getHour(), d.getOrarioInizio().getMinute(), d.getOrarioFine().getHour(), d.getOrarioFine().getMinute()));
         }
 
         DatePicker giornoPicker = new DatePicker();
         giornoPicker.setPromptText("Nuova data");
         giornoPicker.setStyle("-fx-font-size: 14px; -fx-background-color: #252525; -fx-text-fill: #1CA9E2;");
-
         RadioButton allDayBtn = new RadioButton("Tutto il giorno");
         RadioButton fasciaBtn = new RadioButton("Fascia oraria");
         ToggleGroup group = new ToggleGroup();
@@ -91,7 +100,7 @@ public class ModificaDisponibilitaViewFX {
                 esito.setText("Seleziona una disponibilità!");
                 return;
             }
-            DisponibilitaAnimatore old = lista.get(idx);
+            DisponibilitaAnimatoreBean old = lista.get(idx);
             LocalDate data = giornoPicker.getValue() != null ? giornoPicker.getValue() : old.getData();
             boolean tuttoIlGiorno = group.getSelectedToggle() == allDayBtn;
             LocalTime inizio = null, fine = null;
@@ -106,12 +115,13 @@ public class ModificaDisponibilitaViewFX {
             boolean cambiato = !old.getData().equals(data) || old.isTuttoIlGiorno() != tuttoIlGiorno ||
                     (old.getOrarioInizio() != null && !old.getOrarioInizio().equals(inizio)) ||
                     (old.getOrarioFine() != null && !old.getOrarioFine().equals(fine));
-            if (cambiato && disponibilitaDAO.esisteDisponibilitaSovrapposta(utente.getAziendaId(), utente.getId(), data, inizio, fine, tuttoIlGiorno)) {
+            if (cambiato && visualizzaDisponibilitaDAO.esisteSovrapposizione(utente.getAziendaId(), utente.getId(),
+                    data, inizio, fine, tuttoIlGiorno, old.getId())) {
                 esito.setText("Disponibilità sovrapposta o già presente per questa data!");
                 return;
             }
             old.setData(data); old.setTuttoIlGiorno(tuttoIlGiorno); old.setOrarioInizio(inizio); old.setOrarioFine(fine);
-            boolean ok = disponibilitaDAO.updateDisponibilita(old);
+            boolean ok = modificaDisponibilitaDAO.modifica(old);
             if (ok) {
                 esito.setText("Disponibilità aggiornata!");
                 dispList.getItems().set(idx, tuttoIlGiorno ? (data + " | Tutto il giorno")
@@ -120,7 +130,16 @@ public class ModificaDisponibilitaViewFX {
             } else esito.setText("Errore nell'aggiornamento!");
         });
 
-        indietro.setOnAction(ev -> new CalendarioDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
+        indietro.setOnAction(ev ->
+                new CalendarioDisponibilitaViewFX(
+                        primaryStage,
+                        utente,
+                        animazioneazienda.view.FX.EntryPointViewFX.visualizzaDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.inserisciDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.modificaDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.eliminaDisponibilitaDAO
+                ).show()
+        );
 
         pane.getChildren().addAll(titolo, dispList, giornoPicker, new HBox(16, allDayBtn, fasciaBtn), boxOrario, modifica, boxIndietro, esito);
         primaryStage.setScene(new Scene(pane, 550, 430));

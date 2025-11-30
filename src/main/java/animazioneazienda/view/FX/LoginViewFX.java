@@ -1,6 +1,6 @@
 package animazioneazienda.view.FX;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.view.FX.animatore.AnimatoreMenuFX;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -106,7 +106,7 @@ public class LoginViewFX {
                     ? passwordField.getText().trim()
                     : passwordVisibleField.getText().trim();
 
-            Utente utente = EntryPointViewFX.loginController.doLoginReturnUtente(email, password);
+            UtenteBean utente = EntryPointViewFX.loginController.doLoginReturnUtente(email, password);
             if (utente == null) {
                 messageLabel.setText("Login fallito! Controlla le credenziali.");
                 return;

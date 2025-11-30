@@ -2,25 +2,27 @@ package animazioneazienda.bean;
 
 import java.sql.Date;
 
-public class Utente {
-    public enum Ruolo { SUPERADMIN, AMMINISTRATORE, ANIMATORE }
+public class UtenteBean {
+    public enum Ruolo { AMMINISTRATORE, ANIMATORE, SUPERADMIN }
 
     private int id;
-    private String email;
-    private String password;
-    private Ruolo ruolo;
     private int aziendaId;
     private String aziendaNome;
     private String nome;
     private String cognome;
+    private Ruolo ruolo;
+    private boolean attivo;
+
+    /** CAMPI MANCANTI - aggiunti: */
+    private String email;
+    private String password;
     private String sesso;
     private Date dataNascita;
 
-    public Utente() {}
+    public UtenteBean() {}
 
-    // Costruttore completo
-    public Utente(String email, String password, Ruolo ruolo, int aziendaId, String aziendaNome,
-                  String nome, String cognome, String sesso, Date dataNascita) {
+    // Costruttori sovraccarichi richiamati dai vari file:
+    public UtenteBean(String email, String password, Ruolo ruolo, int aziendaId, String aziendaNome, String nome, String cognome, String sesso, Date dataNascita) {
         this.email = email;
         this.password = password;
         this.ruolo = ruolo;
@@ -30,33 +32,20 @@ public class Utente {
         this.cognome = cognome;
         this.sesso = sesso;
         this.dataNascita = dataNascita;
+        this.attivo = true;
     }
-
-    // Costruttore base per superadmin (console)
-    public Utente(String email, String password, Ruolo ruolo, int aziendaId, String aziendaNome) {
+    public UtenteBean(String email, String password, Ruolo ruolo, int aziendaId, String aziendaNome) {
         this.email = email;
         this.password = password;
         this.ruolo = ruolo;
         this.aziendaId = aziendaId;
         this.aziendaNome = aziendaNome;
-        this.nome = null;
-        this.cognome = null;
-        this.sesso = null;
-        this.dataNascita = null;
+        this.attivo = true;
     }
 
-    // Getters and Setters
+    // Getter & setter per TUTTI I CAMPI:
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public Ruolo getRuolo() { return ruolo; }
-    public void setRuolo(Ruolo ruolo) { this.ruolo = ruolo; }
 
     public int getAziendaId() { return aziendaId; }
     public void setAziendaId(int aziendaId) { this.aziendaId = aziendaId; }
@@ -69,6 +58,18 @@ public class Utente {
 
     public String getCognome() { return cognome; }
     public void setCognome(String cognome) { this.cognome = cognome; }
+
+    public Ruolo getRuolo() { return ruolo; }
+    public void setRuolo(Ruolo ruolo) { this.ruolo = ruolo; }
+
+    public boolean isAttivo() { return attivo; }
+    public void setAttivo(boolean attivo) { this.attivo = attivo; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 
     public String getSesso() { return sesso; }
     public void setSesso(String sesso) { this.sesso = sesso; }

@@ -1,7 +1,7 @@
 package animazioneazienda.view.FX.animatore;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,17 +22,17 @@ import java.sql.SQLException;
 
 public class AnimatoreStatusViewFX {
     private final Stage primaryStage;
-    private final Utente utente;
+    private final UtenteBean utente;
     private final StatusAnimatoreDAO statusAnimatoreDAO;
 
-    public AnimatoreStatusViewFX(Stage primaryStage, Utente utente, StatusAnimatoreDAO statusAnimatoreDAO) {
+    public AnimatoreStatusViewFX(Stage primaryStage, UtenteBean utente, StatusAnimatoreDAO statusAnimatoreDAO) {
         this.primaryStage = primaryStage;
         this.utente = utente;
         this.statusAnimatoreDAO = statusAnimatoreDAO;
     }
 
     public void show() {
-        StatusAnimatore status = null;
+        StatusAnimatoreBean status = null;
         try {
             status = statusAnimatoreDAO.findByAnimatore(utente.getAziendaId(), utente.getId());
         } catch (SQLException e) {
@@ -73,7 +73,7 @@ public class AnimatoreStatusViewFX {
         primaryStage.centerOnScreen();
     }
 
-    private void showProfiloCreato(StatusAnimatore status) {
+    private void showProfiloCreato(StatusAnimatoreBean status) {
         VBox root = new VBox(24);
         root.setAlignment(Pos.CENTER);
         root.setStyle("-fx-background-color: #181818; -fx-padding: 46;");
@@ -113,7 +113,7 @@ public class AnimatoreStatusViewFX {
         primaryStage.centerOnScreen();
     }
 
-    private void showSetupStatus(StatusAnimatore status) {
+    private void showSetupStatus(StatusAnimatoreBean status) {
         VBox root = new VBox(18);
         root.setStyle("-fx-background-color: #181818; -fx-padding: 55; -fx-alignment: center;");
         root.setAlignment(Pos.CENTER);
@@ -265,7 +265,7 @@ public class AnimatoreStatusViewFX {
             String lavoriAccettatiCsv = String.join(",", lavoriSelezionati);
             String statoValue = comboStato.getValue();
 
-            StatusAnimatore nuovoStatus = new StatusAnimatore();
+            StatusAnimatoreBean nuovoStatus = new StatusAnimatoreBean();
             nuovoStatus.setAnimatoreId(utente.getId());
             nuovoStatus.setAziendaId(utente.getAziendaId());
             nuovoStatus.setModelloAuto(modello);
@@ -303,7 +303,7 @@ public class AnimatoreStatusViewFX {
         primaryStage.centerOnScreen();
     }
 
-    private String statusToString(StatusAnimatore s) {
+    private String statusToString(StatusAnimatoreBean s) {
         StringBuilder sb = new StringBuilder();
         if (s.getModelloAuto() != null && !s.getModelloAuto().isEmpty())
             sb.append("Auto: ").append(s.getModelloAuto())

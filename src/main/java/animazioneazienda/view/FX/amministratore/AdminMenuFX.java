@@ -1,13 +1,13 @@
 package animazioneazienda.view.FX.amministratore;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class AdminMenuFX {
-    public void start(Stage stage, Utente utente) {
+    public void start(Stage stage, UtenteBean utente) {
         VBox box = new VBox(20);
         box.setStyle("-fx-padding: 38; -fx-alignment: center;");
         Label msg = new Label("Benvenuto, " + utente.getRuolo() + " di " + utente.getAziendaId());

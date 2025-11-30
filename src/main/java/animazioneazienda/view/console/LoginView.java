@@ -1,7 +1,7 @@
 package animazioneazienda.view.console;
 
 import animazioneazienda.controller.LoginController;
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import java.util.Scanner;
 
 public class LoginView {
@@ -11,7 +11,7 @@ public class LoginView {
         this.loginController = loginController;
     }
 
-    public Utente doLoginReturnUtente() {
+    public UtenteBean doLoginReturnUtente() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Email: ");
@@ -20,7 +20,7 @@ public class LoginView {
         System.out.print("Password: ");
         String password = scanner.nextLine().trim();
 
-        Utente utente = loginController.doLoginReturnUtente(email, password);
+        UtenteBean utente = loginController.doLoginReturnUtente(email, password);
 
         if (utente != null) {
             System.out.println("Benvenuto " + utente.getNome() + " " + utente.getCognome() + "!");

@@ -1,7 +1,11 @@
 package animazioneazienda.view.FX.animatore.disponibilita;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -16,13 +20,28 @@ import javafx.stage.Stage;
 
 public class CalendarioDisponibilitaViewFX {
     private final Stage primaryStage;
-    private final Utente utente;
-    private final DisponibilitaAnimatoreDAO disponibilitaDAO;
+    private final UtenteBean utente;
 
-    public CalendarioDisponibilitaViewFX(Stage primaryStage, Utente utente, DisponibilitaAnimatoreDAO disponibilitaDAO) {
+    // I nuovi DAO modulari
+    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    private final InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
+    private final ModificaDisponibilitaDAO modificaDisponibilitaDAO;
+    private final EliminaDisponibilitaDAO eliminaDisponibilitaDAO;
+
+    public CalendarioDisponibilitaViewFX(
+            Stage primaryStage,
+            UtenteBean utente,
+            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO,
+            InserisciDisponibilitaDAO inserisciDisponibilitaDAO,
+            ModificaDisponibilitaDAO modificaDisponibilitaDAO,
+            EliminaDisponibilitaDAO eliminaDisponibilitaDAO
+    ) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.disponibilitaDAO = disponibilitaDAO;
+        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
+        this.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
+        this.modificaDisponibilitaDAO = modificaDisponibilitaDAO;
+        this.eliminaDisponibilitaDAO = eliminaDisponibilitaDAO;
     }
 
     public void show() {
@@ -39,27 +58,11 @@ public class CalendarioDisponibilitaViewFX {
         HBox titleBox = new HBox(title);
         titleBox.setAlignment(Pos.CENTER);
 
-        ImageView inserisciIcon = new ImageView(new Image(getClass().getResourceAsStream("/inserisci.png")));
-        inserisciIcon.setFitWidth(26); inserisciIcon.setFitHeight(26);
-        Button inserisciBtn = new Button("Inserisci Disponibilità", inserisciIcon);
-
-        ImageView modificaIcon = new ImageView(new Image(getClass().getResourceAsStream("/modifica.png")));
-        modificaIcon.setFitWidth(26); modificaIcon.setFitHeight(26);
-        Button modificaBtn = new Button("Modifica Disponibilità", modificaIcon);
-
-        ImageView visualizzaIcon = new ImageView(new Image(getClass().getResourceAsStream("/visualizza.png")));
-        visualizzaIcon.setFitWidth(26); visualizzaIcon.setFitHeight(26);
-        Button visualizzaBtn = new Button("Visualizza Disponibilità", visualizzaIcon);
-
-        ImageView eliminaIcon = new ImageView(new Image(getClass().getResourceAsStream("/elimina.png")));
-        eliminaIcon.setFitWidth(26); eliminaIcon.setFitHeight(26);
-        Button eliminaBtn = new Button("Elimina Disponibilità", eliminaIcon);
-
-        for (Button b : new Button[]{inserisciBtn, modificaBtn, visualizzaBtn, eliminaBtn}) {
-            b.setStyle("-fx-font-size: 16px; -fx-background-color: #1CA9E2; -fx-text-fill: #181818;");
-            b.setMaxWidth(320);
-            VBox.setMargin(b, new Insets(0,0,8,0));
-        }
+        // Pulsanti con azioni specializzate
+        Button inserisciBtn = buttonIcon("Inserisci Disponibilità", "/inserisci.png");
+        Button modificaBtn = buttonIcon("Modifica Disponibilità", "/modifica.png");
+        Button visualizzaBtn = buttonIcon("Visualizza Disponibilità", "/visualizza.png");
+        Button eliminaBtn = buttonIcon("Elimina Disponibilità", "/elimina.png");
 
         ImageView backIcon = new ImageView(new Image(getClass().getResourceAsStream("/left_arrow.png")));
         backIcon.setFitHeight(28); backIcon.setFitWidth(28);
@@ -72,16 +75,31 @@ public class CalendarioDisponibilitaViewFX {
 
         root.getChildren().addAll(titleBox, inserisciBtn, modificaBtn, visualizzaBtn, eliminaBtn, boxIndietro);
 
-        inserisciBtn.setOnAction(ev -> new InserisciDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
-        modificaBtn.setOnAction(ev -> new ModificaDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
-        visualizzaBtn.setOnAction(ev -> new VisualizzaDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
-        eliminaBtn.setOnAction(ev -> new EliminaDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
+        inserisciBtn.setOnAction(ev ->
+                new InserisciDisponibilitaViewFX(primaryStage, utente, inserisciDisponibilitaDAO, visualizzaDisponibilitaDAO).show());
+        modificaBtn.setOnAction(ev ->
+                new ModificaDisponibilitaViewFX(primaryStage, utente, modificaDisponibilitaDAO, visualizzaDisponibilitaDAO).show());
+        visualizzaBtn.setOnAction(ev ->
+                new VisualizzaDisponibilitaViewFX(primaryStage, utente, visualizzaDisponibilitaDAO).show());
+        eliminaBtn.setOnAction(ev ->
+                new EliminaDisponibilitaViewFX(primaryStage, utente, eliminaDisponibilitaDAO, visualizzaDisponibilitaDAO).show());
+
         indietroBtn.setOnAction(ev -> {
-            // Torna al menu principale animatore
             new animazioneazienda.view.FX.animatore.AnimatoreMenuFX(primaryStage, utente).show();
         });
 
         primaryStage.setScene(new Scene(root, 900, 600));
         primaryStage.centerOnScreen();
+    }
+
+    private Button buttonIcon(String text, String res) {
+        ImageView icon = new ImageView(new Image(getClass().getResourceAsStream(res)));
+        icon.setFitHeight(26); icon.setFitWidth(26);
+        Button btn = new Button(text, icon);
+        btn.setStyle("-fx-font-size: 16px; -fx-background-color: #1CA9E2; -fx-text-fill: #181818;");
+        btn.setMaxWidth(320);
+        VBox.setMargin(btn, new Insets(0,0,8,0));
+        btn.setGraphicTextGap(12);
+        return btn;
     }
 }

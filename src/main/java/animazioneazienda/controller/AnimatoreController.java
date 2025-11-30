@@ -1,6 +1,6 @@
 package animazioneazienda.controller;
 
-import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.exception.DaoException;
 import animazioneazienda.dao.animatore.StatusAnimatoreRepository;
 
@@ -11,11 +11,11 @@ public class AnimatoreController {
         this.repo = repo;
     }
 
-    public StatusAnimatore caricaStatus(int aziendaId, int userId) throws DaoException {
+    public StatusAnimatoreBean caricaStatus(int aziendaId, int userId) throws DaoException {
         return repo.findByAnimatore(aziendaId, userId);
     }
 
-    public boolean salvaOAggiornaStatus(StatusAnimatore status) throws DaoException {
+    public boolean salvaOAggiornaStatus(StatusAnimatoreBean status) throws DaoException {
         return repo.insertOrUpdate(status);
     }
 }

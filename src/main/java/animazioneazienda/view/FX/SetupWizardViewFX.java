@@ -2,7 +2,7 @@ package animazioneazienda.view.FX;
 
 import animazioneazienda.dao.AziendaDAO;
 import animazioneazienda.dao.UtenteDAO;
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
@@ -60,7 +60,7 @@ public class SetupWizardViewFX {
                 int aziendaId = aziendaDAO.registraAzienda(nomeAzienda);
                 if (aziendaId <= 0) throw new Exception("Errore creazione azienda");
                 boolean res = utenteDAO.insertUtente(
-                        new Utente(email, pw, Utente.Ruolo.SUPERADMIN, aziendaId, nomeAzienda)
+                        new UtenteBean(email, pw, UtenteBean.Ruolo.SUPERADMIN, aziendaId, nomeAzienda)
                 );
                 if (res) {
                     messageLabel.setText("Setup completato! Superadmin e azienda creati.");

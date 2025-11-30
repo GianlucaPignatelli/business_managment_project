@@ -1,13 +1,13 @@
 package animazioneazienda.view.console.amministratore;
 
 import animazioneazienda.dao.AziendaDAO;
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 
 public class AdminMenuConsoleView {
     private final AziendaDAO aziendaDAO;
-    private final Utente amministratore;
+    private final UtenteBean amministratore;
 
-    public AdminMenuConsoleView(AziendaDAO aziendaDAO, Utente amministratore) {
+    public AdminMenuConsoleView(AziendaDAO aziendaDAO, UtenteBean amministratore) {
         this.aziendaDAO = aziendaDAO;
         this.amministratore = amministratore;
     }

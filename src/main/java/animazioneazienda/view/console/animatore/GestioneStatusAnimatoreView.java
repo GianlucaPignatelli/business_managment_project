@@ -1,24 +1,24 @@
 package animazioneazienda.view.console.animatore;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.controller.AnimatoreController;
 import animazioneazienda.exception.DaoException;
 import java.util.*;
 
 public class GestioneStatusAnimatoreView {
-    private final Utente animatore;
+    private final UtenteBean animatore;
     private final AnimatoreController animatoreController;
     private final Scanner scanner = new Scanner(System.in);
 
-    public GestioneStatusAnimatoreView(Utente animatore, AnimatoreController animatoreController) {
+    public GestioneStatusAnimatoreView(UtenteBean animatore, AnimatoreController animatoreController) {
         this.animatore = animatore;
         this.animatoreController = animatoreController;
     }
 
     public void gestisciStatusAnimatore() {
         try {
-            StatusAnimatore currStatus = animatoreController.caricaStatus(animatore.getAziendaId(), animatore.getId());
+            StatusAnimatoreBean currStatus = animatoreController.caricaStatus(animatore.getAziendaId(), animatore.getId());
             System.out.println("\n--- IL TUO PROFILO ---");
             if (currStatus != null) {
                 System.out.println("Modello auto: " + currStatus.getModelloAuto());
@@ -71,7 +71,7 @@ public class GestioneStatusAnimatoreView {
             System.out.print("Stato (Disponibile/Non operativo): ");
             String stato = scanner.nextLine();
 
-            StatusAnimatore s = new StatusAnimatore();
+            StatusAnimatoreBean s = new StatusAnimatoreBean();
             s.setAnimatoreId(animatore.getId());
             s.setAziendaId(animatore.getAziendaId());
             s.setModelloAuto(modelloAuto);

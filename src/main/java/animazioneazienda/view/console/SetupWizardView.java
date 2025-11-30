@@ -2,7 +2,7 @@ package animazioneazienda.view.console;
 
 import animazioneazienda.dao.AziendaDAO;
 import animazioneazienda.dao.UtenteDAO;
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -34,7 +34,7 @@ public class SetupWizardView {
             boolean res = false;
             try {
                 res = utenteDAO.insertUtente(
-                        new Utente(email, pw, Utente.Ruolo.SUPERADMIN, aziendaId, nomeAzienda)
+                        new UtenteBean(email, pw, UtenteBean.Ruolo.SUPERADMIN, aziendaId, nomeAzienda)
                 );
             } catch (SQLException ex) {
                 System.out.println("Errore registrazione SUPERADMIN: " + ex.getMessage());

@@ -1,6 +1,6 @@
 package animazioneazienda.dao.animatore;
 
-import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.exception.DaoException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -12,13 +12,13 @@ import java.util.Map;
 public class StatusAnimatoreJsonRepository implements StatusAnimatoreRepository {
     private final File jsonFile;
     private final ObjectMapper mapper = new ObjectMapper();
-    private Map<String, StatusAnimatore> data = new HashMap<>();
+    private Map<String, StatusAnimatoreBean> data = new HashMap<>();
 
     public StatusAnimatoreJsonRepository(File jsonFile) throws DaoException {
         this.jsonFile = jsonFile;
         try {
             if (jsonFile.exists()) {
-                data = mapper.readValue(jsonFile, new TypeReference<Map<String, StatusAnimatore>>() {});
+                data = mapper.readValue(jsonFile, new TypeReference<Map<String, StatusAnimatoreBean>>() {});
             }
         } catch (Exception e) {
             throw new DaoException("Errore JSON nell'inizializzazione", e);
@@ -26,13 +26,13 @@ public class StatusAnimatoreJsonRepository implements StatusAnimatoreRepository 
     }
 
     @Override
-    public StatusAnimatore findByAnimatore(int aziendaId, int animatoreId) throws DaoException {
+    public StatusAnimatoreBean findByAnimatore(int aziendaId, int animatoreId) throws DaoException {
         String key = aziendaId + "_" + animatoreId;
         return data.get(key);
     }
 
     @Override
-    public boolean insertOrUpdate(StatusAnimatore s) throws DaoException {
+    public boolean insertOrUpdate(StatusAnimatoreBean s) throws DaoException {
         String key = s.getAziendaId() + "_" + s.getAnimatoreId();
         data.put(key, s);
         try {

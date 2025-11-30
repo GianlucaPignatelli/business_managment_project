@@ -1,10 +1,10 @@
 package animazioneazienda.view.console;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import java.util.Scanner;
 
 public class SuperadminConsoleMenu {
-    public static void showMenu(Utente admin, AziendaView aziendaView, Scanner scan) {
+    public static void showMenu(UtenteBean admin, AziendaView aziendaView, Scanner scan) {
         while (true) {
             System.out.println("\n--- MENU SUPERADMIN (" + admin.getEmail() + ") ---");
             System.out.println("1. Registra nuova azienda");

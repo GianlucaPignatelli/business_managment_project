@@ -1,8 +1,9 @@
 package animazioneazienda.view.FX.animatore.disponibilita;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.DisponibilitaAnimatore;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
+import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,13 +20,20 @@ import java.util.List;
 
 public class EliminaDisponibilitaViewFX {
     private final Stage primaryStage;
-    private final Utente utente;
-    private final DisponibilitaAnimatoreDAO disponibilitaDAO;
+    private final UtenteBean utente;
+    private final EliminaDisponibilitaDAO eliminaDisponibilitaDAO;
+    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
 
-    public EliminaDisponibilitaViewFX(Stage primaryStage, Utente utente, DisponibilitaAnimatoreDAO disponibilitaDAO) {
+    public EliminaDisponibilitaViewFX(
+            Stage primaryStage,
+            UtenteBean utente,
+            EliminaDisponibilitaDAO eliminaDisponibilitaDAO,
+            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO
+    ) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.disponibilitaDAO = disponibilitaDAO;
+        this.eliminaDisponibilitaDAO = eliminaDisponibilitaDAO;
+        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
     }
 
     public void show() {
@@ -40,13 +48,14 @@ public class EliminaDisponibilitaViewFX {
 
         ListView<String> dispList = new ListView<>();
         dispList.setStyle("-fx-control-inner-background: #181818; -fx-text-fill: #1CA9E2;");
-        List<DisponibilitaAnimatore> lista = disponibilitaDAO.findByAnimatore(utente.getAziendaId(), utente.getId());
-        for (DisponibilitaAnimatore d : lista) {
+        List<DisponibilitaAnimatoreBean> lista = visualizzaDisponibilitaDAO.trovaPerAnimatore(utente.getAziendaId(), utente.getId());
+        for (DisponibilitaAnimatoreBean d : lista) {
             if (d.isTuttoIlGiorno())
                 dispList.getItems().add(d.getData() + " | Tutto il giorno");
             else
                 dispList.getItems().add(String.format("%s | %02d:%02d - %02d:%02d",
-                        d.getData(), d.getOrarioInizio().getHour(), d.getOrarioInizio().getMinute(), d.getOrarioFine().getHour(), d.getOrarioFine().getMinute()));
+                        d.getData(), d.getOrarioInizio().getHour(), d.getOrarioInizio().getMinute(),
+                        d.getOrarioFine().getHour(), d.getOrarioFine().getMinute()));
         }
 
         Button elimina = new Button("Elimina selezionata");
@@ -65,8 +74,8 @@ public class EliminaDisponibilitaViewFX {
             if (idx == -1) {
                 esito.setText("Seleziona una disponibilità da eliminare!");
             } else {
-                DisponibilitaAnimatore d = lista.get(idx);
-                boolean ok = disponibilitaDAO.removeDisponibilita(d.getId(), utente.getAziendaId(), utente.getId());
+                DisponibilitaAnimatoreBean d = lista.get(idx);
+                boolean ok = eliminaDisponibilitaDAO.elimina(d.getId(), utente.getAziendaId(), utente.getId());
                 if (ok) {
                     dispList.getItems().remove(idx);
                     lista.remove(idx);
@@ -77,7 +86,17 @@ public class EliminaDisponibilitaViewFX {
             }
         });
 
-        indietro.setOnAction(ev -> new CalendarioDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
+        indietro.setOnAction(ev ->
+                new CalendarioDisponibilitaViewFX(
+                        primaryStage,
+                        utente,
+                        animazioneazienda.view.FX.EntryPointViewFX.visualizzaDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.inserisciDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.modificaDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.eliminaDisponibilitaDAO
+                ).show()
+        );
+
         pane.getChildren().addAll(titolo, dispList, elimina, boxIndietro, esito);
         primaryStage.setScene(new Scene(pane, 485, 350));
         primaryStage.centerOnScreen();

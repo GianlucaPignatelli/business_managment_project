@@ -1,9 +1,8 @@
 package animazioneazienda.view.FX.animatore;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
+import animazioneazienda.dao.animatore.OffertaLavoroDAO;
 import animazioneazienda.view.FX.EntryPointViewFX;
 import animazioneazienda.view.FX.animatore.disponibilita.CalendarioDisponibilitaViewFX;
 import javafx.scene.Scene;
@@ -21,9 +20,9 @@ import javafx.scene.text.Font;
 
 public class AnimatoreMenuFX {
     private final Stage primaryStage;
-    private final Utente utente;
+    private final UtenteBean utente;
 
-    public AnimatoreMenuFX(Stage primaryStage, Utente utente) {
+    public AnimatoreMenuFX(Stage primaryStage, UtenteBean utente) {
         this.primaryStage = primaryStage;
         this.utente = utente;
     }
@@ -78,25 +77,32 @@ public class AnimatoreMenuFX {
         );
 
         statusBtn.setOnAction(ev -> {
-            StatusAnimatoreDAO statusDAO = animazioneazienda.view.FX.EntryPointViewFX.statusAnimatoreDAO;
+            StatusAnimatoreDAO statusDAO = EntryPointViewFX.statusAnimatoreDAO;
             AnimatoreStatusViewFX statusView = new AnimatoreStatusViewFX(primaryStage, utente, statusDAO);
             statusView.show();
         });
 
         offerteBtn.setOnAction(ev -> {
-            OffertaLavoroDAO offertaDAO = animazioneazienda.view.FX.EntryPointViewFX.offertaLavoroDAO;
+            OffertaLavoroDAO offertaDAO = EntryPointViewFX.offertaLavoroDAO;
             AnimatoreOfferteViewFX offerteView = new AnimatoreOfferteViewFX(primaryStage, utente, offertaDAO);
             offerteView.show();
         });
 
         disponibilitaBtn.setOnAction(ev -> {
-            DisponibilitaAnimatoreDAO disponibilitaDAO = EntryPointViewFX.disponibilitaAnimatoreDAO;
-            CalendarioDisponibilitaViewFX disponibilitaView = new CalendarioDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO);
+            // Recupera tutti e 4 i DAO modulari e passa al CalendarioDisponibilitaViewFX!
+            CalendarioDisponibilitaViewFX disponibilitaView = new CalendarioDisponibilitaViewFX(
+                    primaryStage,
+                    utente,
+                    EntryPointViewFX.visualizzaDisponibilitaDAO,
+                    EntryPointViewFX.inserisciDisponibilitaDAO,
+                    EntryPointViewFX.modificaDisponibilitaDAO,
+                    EntryPointViewFX.eliminaDisponibilitaDAO
+            );
             disponibilitaView.show();
         });
 
         indietroBtn.setOnAction(ev -> {
-            animazioneazienda.view.FX.EntryPointViewFX.showMainMenu(primaryStage);
+            EntryPointViewFX.showMainMenu(primaryStage);
         });
 
         Scene scene = new Scene(root, 900, 600);

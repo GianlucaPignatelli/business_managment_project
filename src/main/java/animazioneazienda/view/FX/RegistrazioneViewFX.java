@@ -1,6 +1,6 @@
 package animazioneazienda.view.FX;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -148,9 +148,9 @@ public class RegistrazioneViewFX {
             if (!isEmailValid(email)) {
                 messageLabel.setText("Email non valida! Usa una email @gmail.com."); return;
             }
-            Utente.Ruolo ruolo = "AMMINISTRATORE".equals(ruoloStr)
-                    ? Utente.Ruolo.AMMINISTRATORE
-                    : Utente.Ruolo.ANIMATORE;
+            UtenteBean.Ruolo ruolo = "AMMINISTRATORE".equals(ruoloStr)
+                    ? UtenteBean.Ruolo.AMMINISTRATORE
+                    : UtenteBean.Ruolo.ANIMATORE;
             int aziendaId;
             try {
                 aziendaId = EntryPointViewFX.aziendaDAO.findIdByNome(nomeAzienda);
@@ -161,7 +161,7 @@ public class RegistrazioneViewFX {
             if (aziendaId == -1) {
                 messageLabel.setText("Azienda non esistente! Chiedi al Superadmin di registrare la tua azienda."); return;
             }
-            Utente nuovo = new Utente(email, password, ruolo, aziendaId, nomeAzienda,
+            UtenteBean nuovo = new UtenteBean(email, password, ruolo, aziendaId, nomeAzienda,
                     nome, cognome, sesso, java.sql.Date.valueOf(dataNascita));
             try {
                 boolean successo = EntryPointViewFX.utenteDAO.insertUtente(nuovo);

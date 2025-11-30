@@ -1,30 +1,37 @@
 package animazioneazienda.view.console.animatore.disponibilita;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.DisponibilitaAnimatore;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
+import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
 import java.util.List;
 import java.util.Scanner;
 
 public class EliminaDisponibilitaView {
-    private final DisponibilitaAnimatoreDAO disponibilitaDAO;
-    private final Utente animatore;
+    private final EliminaDisponibilitaDAO eliminaDisponibilitaDAO;
+    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    private final UtenteBean animatore;
     private final Scanner scanner = new Scanner(System.in);
 
-    public EliminaDisponibilitaView(DisponibilitaAnimatoreDAO disponibilitaDAO, Utente animatore) {
-        this.disponibilitaDAO = disponibilitaDAO;
+    public EliminaDisponibilitaView(
+            EliminaDisponibilitaDAO eliminaDisponibilitaDAO,
+            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO,
+            UtenteBean animatore
+    ) {
+        this.eliminaDisponibilitaDAO = eliminaDisponibilitaDAO;
+        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
         this.animatore = animatore;
     }
 
     public void rimuoviDisponibilita() {
         try {
-            List<DisponibilitaAnimatore> lista = disponibilitaDAO.findByAnimatore(animatore.getAziendaId(), animatore.getId());
+            List<DisponibilitaAnimatoreBean> lista = visualizzaDisponibilitaDAO.trovaPerAnimatore(animatore.getAziendaId(), animatore.getId());
             if (lista.isEmpty()) {
                 System.out.println("Nessuna disponibilità da rimuovere.");
                 return;
             }
             System.out.println("Seleziona ID della disponibilità da rimuovere:");
-            for (DisponibilitaAnimatore d : lista) {
+            for (DisponibilitaAnimatoreBean d : lista) {
                 System.out.print("ID: " + d.getId() + " | Data: " + d.getData());
                 if (d.isTuttoIlGiorno()) {
                     System.out.println(" | Tutto il giorno");
@@ -35,7 +42,7 @@ public class EliminaDisponibilitaView {
             System.out.print("ID da rimuovere: ");
             int id = Integer.parseInt(scanner.nextLine());
 
-            boolean ok = disponibilitaDAO.removeDisponibilita(id, animatore.getAziendaId(), animatore.getId());
+            boolean ok = eliminaDisponibilitaDAO.elimina(id, animatore.getAziendaId(), animatore.getId());
             if (ok) {
                 System.out.println("Disponibilità rimossa!");
             } else {

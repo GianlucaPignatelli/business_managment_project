@@ -1,8 +1,9 @@
 package animazioneazienda.view.FX.animatore.disponibilita;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.DisponibilitaAnimatore;
-import animazioneazienda.dao.animatore.DisponibilitaAnimatoreDAO;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
+import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,13 +21,16 @@ import java.time.LocalTime;
 
 public class InserisciDisponibilitaViewFX {
     private final Stage primaryStage;
-    private final Utente utente;
-    private final DisponibilitaAnimatoreDAO disponibilitaDAO;
+    private final UtenteBean utente;
+    private final InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
+    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
 
-    public InserisciDisponibilitaViewFX(Stage primaryStage, Utente utente, DisponibilitaAnimatoreDAO disponibilitaDAO) {
+    public InserisciDisponibilitaViewFX(Stage primaryStage, UtenteBean utente,
+                                        InserisciDisponibilitaDAO inserisciDisponibilitaDAO, VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.disponibilitaDAO = disponibilitaDAO;
+        this.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
+        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
     }
 
     public void show() {
@@ -99,24 +103,34 @@ public class InserisciDisponibilitaViewFX {
                     return;
                 }
             }
-            // >>> CONTROLLO SOVRAPPOSIZIONE DAL DAO
-            if (disponibilitaDAO.esisteDisponibilitaSovrapposta(utente.getAziendaId(), utente.getId(), giorno, inizio, fine, tuttoIlGiorno)) {
+            // >>> CONTROLLO SOVRAPPOSIZIONE DAL DAO CORRETTO
+            if (visualizzaDisponibilitaDAO.esisteSovrapposizione(utente.getAziendaId(), utente.getId(), giorno, inizio, fine, tuttoIlGiorno)) {
                 esito.setText("Disponibilità sovrapposta o già presente per quel giorno!");
                 return;
             }
-            DisponibilitaAnimatore d = new DisponibilitaAnimatore();
+            DisponibilitaAnimatoreBean d = new DisponibilitaAnimatoreBean();
             d.setAziendaId(utente.getAziendaId());
             d.setAnimatoreId(utente.getId());
             d.setData(giorno);
             d.setTuttoIlGiorno(tuttoIlGiorno);
             d.setOrarioInizio(inizio);
             d.setOrarioFine(fine);
-            boolean ok = disponibilitaDAO.insertDisponibilita(d);
+            boolean ok = inserisciDisponibilitaDAO.inserisci(d);
             if (ok) esito.setText("Disponibilità aggiunta!");
             else esito.setText("Errore nell'aggiunta");
         });
 
-        indietro.setOnAction(ev -> new CalendarioDisponibilitaViewFX(primaryStage, utente, disponibilitaDAO).show());
+        indietro.setOnAction(ev ->
+                new CalendarioDisponibilitaViewFX(
+                        primaryStage,
+                        utente,
+                        animazioneazienda.view.FX.EntryPointViewFX.visualizzaDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.inserisciDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.modificaDisponibilitaDAO,
+                        animazioneazienda.view.FX.EntryPointViewFX.eliminaDisponibilitaDAO
+                ).show()
+        );
+
         pane.getChildren().addAll(titolo, giornoPicker, new HBox(16, allDayBtn, fasciaBtn), boxOrario, conferma, boxIndietro, esito);
         primaryStage.setScene(new Scene(pane, 500, 430));
         primaryStage.centerOnScreen();

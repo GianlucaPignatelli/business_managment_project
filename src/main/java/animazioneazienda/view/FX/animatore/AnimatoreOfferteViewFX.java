@@ -1,7 +1,7 @@
 package animazioneazienda.view.FX.animatore;
 
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.animatore.OffertaLavoro;
+import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.bean.animatore.OffertaLavoroBean;
 import animazioneazienda.dao.animatore.OffertaLavoroDAO;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -18,10 +18,10 @@ import java.util.List;
 
 public class AnimatoreOfferteViewFX {
     private final Stage primaryStage;
-    private final Utente animatore;
+    private final UtenteBean animatore;
     private final OffertaLavoroDAO offertaDAO;
 
-    public AnimatoreOfferteViewFX(Stage primaryStage, Utente animatore, OffertaLavoroDAO offertaDAO) {
+    public AnimatoreOfferteViewFX(Stage primaryStage, UtenteBean animatore, OffertaLavoroDAO offertaDAO) {
         this.primaryStage = primaryStage;
         this.animatore = animatore;
         this.offertaDAO = offertaDAO;
@@ -121,8 +121,8 @@ public class AnimatoreOfferteViewFX {
     private void updateOfferte(ListView<String> lv) {
         lv.getItems().clear();
         try {
-            List<OffertaLavoro> lista = offertaDAO.findByAnimatore(animatore.getAziendaId(), animatore.getId());
-            for (OffertaLavoro o : lista) {
+            List<OffertaLavoroBean> lista = offertaDAO.findByAnimatore(animatore.getAziendaId(), animatore.getId());
+            for (OffertaLavoroBean o : lista) {
                 String descr = String.format("ID:%d | %s | %s-%s | %s | Stato: %s",
                         o.getId(),
                         o.getDataEvento(),

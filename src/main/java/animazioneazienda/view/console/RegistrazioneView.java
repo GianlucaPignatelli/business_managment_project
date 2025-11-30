@@ -1,7 +1,7 @@
 package animazioneazienda.view.console;
 
 import animazioneazienda.controller.LoginController;
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.dao.AziendaDAO;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -73,9 +73,9 @@ public class RegistrazioneView {
         System.out.print("Ruolo (AMMINISTRATORE/ANIMATORE): ");
         String ruoloStr = scanner.nextLine().trim().toUpperCase();
 
-        Utente.Ruolo ruolo = "AMMINISTRATORE".equals(ruoloStr)
-                ? Utente.Ruolo.AMMINISTRATORE
-                : Utente.Ruolo.ANIMATORE;
+        UtenteBean.Ruolo ruolo = "AMMINISTRATORE".equals(ruoloStr)
+                ? UtenteBean.Ruolo.AMMINISTRATORE
+                : UtenteBean.Ruolo.ANIMATORE;
 
         boolean successo = loginController.registraUtente(
                 nome,

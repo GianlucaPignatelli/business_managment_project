@@ -1,7 +1,7 @@
 package animazioneazienda.view.console.animatore;
 
 import java.util.*;
-import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 
 public class StatusAnimatoreView {
     // Ruoli disponibili
@@ -12,7 +12,7 @@ public class StatusAnimatoreView {
             "Operatore carretti"
     };
 
-    public StatusAnimatore creaProfiloStatus() {
+    public StatusAnimatoreBean creaProfiloStatus() {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Seleziona i ruoli desiderati (inserisci numeri separati da virgola):");
@@ -45,7 +45,7 @@ public class StatusAnimatoreView {
         String lavoriAccettati = String.join(",", ruoliSelezionati);
 
         // Qui crea il bean StatusAnimatore
-        StatusAnimatore status = new StatusAnimatore();
+        StatusAnimatoreBean status = new StatusAnimatoreBean();
         status.setLavoriAccettati(lavoriAccettati);
         status.setHaccp(haccp);
 

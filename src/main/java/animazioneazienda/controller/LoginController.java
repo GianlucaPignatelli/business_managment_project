@@ -1,6 +1,6 @@
 package animazioneazienda.controller;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.dao.UtenteDAO;
 
 import java.sql.Date;
@@ -12,7 +12,7 @@ public class LoginController {
         this.utenteDAO = utenteDAO;
     }
 
-    public Utente doLoginReturnUtente(String email, String password) {
+    public UtenteBean doLoginReturnUtente(String email, String password) {
         try {
             return utenteDAO.findByEmailAndPassword(email, password);
         } catch (Exception e) {
@@ -30,9 +30,9 @@ public class LoginController {
 
     // REGISTRA UTENTE: tutti dati, incluso ruolo e aziendaId
     public boolean registraUtente(String nome, String cognome, Date dataNascita, String sesso,
-                                  String email, String password, String nomeAzienda, Utente.Ruolo ruolo, int aziendaId) {
+                                  String email, String password, String nomeAzienda, UtenteBean.Ruolo ruolo, int aziendaId) {
         try {
-            Utente utente = new Utente(email, password, ruolo, aziendaId, nomeAzienda, nome, cognome, sesso, dataNascita);
+            UtenteBean utente = new UtenteBean(email, password, ruolo, aziendaId, nomeAzienda, nome, cognome, sesso, dataNascita);
             return utenteDAO.insertUtente(utente);
         } catch (Exception e) {
             e.printStackTrace();

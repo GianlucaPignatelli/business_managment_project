@@ -1,6 +1,6 @@
 package animazioneazienda.view.FX;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.dao.AziendaDAO;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -8,7 +8,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class SuperadminMenuFX {
-    public void start(Stage stage, Utente admin) {
+    public void start(Stage stage, UtenteBean admin) {
         VBox box = new VBox(18);
         box.setStyle("-fx-padding: 36; -fx-alignment: center;");
 

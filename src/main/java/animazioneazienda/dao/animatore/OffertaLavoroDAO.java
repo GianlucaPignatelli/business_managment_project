@@ -1,9 +1,7 @@
 package animazioneazienda.dao.animatore;
 
-import animazioneazienda.bean.animatore.OffertaLavoro;
+import animazioneazienda.bean.animatore.OffertaLavoroBean;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,15 +10,15 @@ public class OffertaLavoroDAO {
     public OffertaLavoroDAO(Connection conn) {
         this.conn = conn;
     }
-    public List<OffertaLavoro> findByAnimatore(int aziendaId, int animatoreId) throws SQLException {
-        List<OffertaLavoro> lista = new ArrayList<>();
+    public List<OffertaLavoroBean> findByAnimatore(int aziendaId, int animatoreId) throws SQLException {
+        List<OffertaLavoroBean> lista = new ArrayList<>();
         String query = "SELECT * FROM offerta_lavoro WHERE azienda_id=? AND animatore_id=?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, aziendaId);
             stmt.setInt(2, animatoreId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                OffertaLavoro o = new OffertaLavoro();
+                OffertaLavoroBean o = new OffertaLavoroBean();
                 o.setId(rs.getInt("id"));
                 o.setAziendaId(rs.getInt("azienda_id"));
                 o.setAnimatoreId(rs.getInt("animatore_id"));

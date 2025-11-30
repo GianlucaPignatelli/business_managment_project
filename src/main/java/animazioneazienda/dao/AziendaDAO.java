@@ -1,6 +1,6 @@
 package animazioneazienda.dao;
 
-import animazioneazienda.bean.Azienda;
+import animazioneazienda.bean.AziendaBean;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +12,13 @@ public class AziendaDAO {
         this.conn = conn;
     }
 
-    public List<Azienda> getAll() throws SQLException {
-        List<Azienda> aziende = new ArrayList<>();
+    public List<AziendaBean> getAll() throws SQLException {
+        List<AziendaBean> aziende = new ArrayList<>();
         String query = "SELECT * FROM aziende";
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                Azienda a = new Azienda();
+                AziendaBean a = new AziendaBean();
                 a.setId(rs.getInt("id"));
                 a.setNome(rs.getString("nome"));
                 aziende.add(a);
@@ -27,13 +27,13 @@ public class AziendaDAO {
         return aziende;
     }
 
-    public Azienda findById(int id) throws SQLException {
+    public AziendaBean findById(int id) throws SQLException {
         String query = "SELECT * FROM aziende WHERE id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                Azienda a = new Azienda();
+                AziendaBean a = new AziendaBean();
                 a.setId(rs.getInt("id"));
                 a.setNome(rs.getString("nome"));
                 return a;

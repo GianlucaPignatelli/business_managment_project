@@ -1,12 +1,12 @@
 package animazioneazienda.dao.animatore;
 
-import animazioneazienda.bean.animatore.StatusAnimatore;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.exception.DaoException;
 
 public class StatusAnimatoreDemoRepository implements StatusAnimatoreRepository {
     @Override
-    public StatusAnimatore findByAnimatore(int aziendaId, int animatoreId) throws DaoException {
-        StatusAnimatore s = new StatusAnimatore();
+    public StatusAnimatoreBean findByAnimatore(int aziendaId, int animatoreId) throws DaoException {
+        StatusAnimatoreBean s = new StatusAnimatoreBean();
         s.setAnimatoreId(animatoreId);
         s.setAziendaId(aziendaId);
         s.setModelloAuto("DemoCar");
@@ -18,7 +18,7 @@ public class StatusAnimatoreDemoRepository implements StatusAnimatoreRepository 
     }
 
     @Override
-    public boolean insertOrUpdate(StatusAnimatore s) throws DaoException {
+    public boolean insertOrUpdate(StatusAnimatoreBean s) throws DaoException {
         return true; // non fa nulla, mock!
     }
 }

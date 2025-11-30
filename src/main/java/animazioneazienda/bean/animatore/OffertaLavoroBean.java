@@ -3,7 +3,7 @@ package animazioneazienda.bean.animatore;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class OffertaLavoro {
+public class OffertaLavoroBean {
     private int id;
     private int aziendaId;
     private int animatoreId;

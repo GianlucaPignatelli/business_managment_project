@@ -1,30 +1,42 @@
 package animazioneazienda;
 
-import animazioneazienda.controller.AnimatoreController;
 import animazioneazienda.controller.LoginController;
-import animazioneazienda.dao.*;
-import animazioneazienda.dao.animatore.*;
-import animazioneazienda.bean.Utente;
-import animazioneazienda.bean.Azienda;
+import animazioneazienda.controller.AnimatoreController;
+import animazioneazienda.controller.animatore.CalendarioDisponibilitaAnimatoreController;
+
+import animazioneazienda.dao.AziendaDAO;
+import animazioneazienda.dao.RepositoryFactory;
+import animazioneazienda.dao.UtenteDAO;
+import animazioneazienda.dao.animatore.StatusAnimatoreRepository;
+import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
+import animazioneazienda.bean.AziendaBean;
+import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.exception.DaoException;
-import animazioneazienda.view.console.*;
+import animazioneazienda.view.console.AziendaView;
+import animazioneazienda.view.console.LoginView;
+import animazioneazienda.view.console.RegistrazioneView;
+import animazioneazienda.view.console.SetupWizardView;
+import animazioneazienda.view.console.SuperadminConsoleMenu;
 import animazioneazienda.view.console.amministratore.AdminMenuConsoleView;
 import animazioneazienda.view.console.animatore.AnimatoreMenuView;
 import animazioneazienda.view.FX.EntryPointViewFX;
-import animazioneazienda.view.console.animatore.disponibilita.GestioneDisponibilitaView;
-import animazioneazienda.view.console.animatore.GestioneStatusAnimatoreView;
-import animazioneazienda.view.console.animatore.GestioneOfferteAnimatoreView;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.io.File;
 import java.util.Scanner;
 
+import static animazioneazienda.view.FX.EntryPointViewFX.statusAnimatoreDAO;
+
 public class Main {
     public static void main(String[] args) {
         Scanner scan = new Scanner(System.in);
 
-        // --- SETUP DB E PERSISTENZA JSON ---
+        // --- SETUP DB ---
         Connection conn = null;
         try {
             String url = "jdbc:mysql://localhost:3306/gestionale_animazione";
@@ -36,29 +48,37 @@ public class Main {
             return;
         }
 
-        // Percorso locale del file JSON
+        // --- Percorso locale file JSON ---
         File jsonFile = new File("animatori.json");
 
         // --- ISTANZIA TUTTE LE DAO ---
         AziendaDAO aziendaDAO = new AziendaDAO(conn);
         UtenteDAO utenteDAO = new UtenteDAO(conn);
-        DisponibilitaAnimatoreDAO disponibilitaAnimatoreDAO = new DisponibilitaAnimatoreDAO(conn);
-        StatusAnimatoreDAO statusAnimatoreDAO = new StatusAnimatoreDAO(conn);
+
+        VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO = new VisualizzaDisponibilitaDAO(conn);
+        InserisciDisponibilitaDAO inserisciDisponibilitaDAO = new InserisciDisponibilitaDAO(conn);
+        ModificaDisponibilitaDAO modificaDisponibilitaDAO = new ModificaDisponibilitaDAO(conn);
+        EliminaDisponibilitaDAO eliminaDisponibilitaDAO = new EliminaDisponibilitaDAO(conn);
+
         OffertaLavoroDAO offertaLavoroDAO = new OffertaLavoroDAO(conn);
+
         LoginController loginController = new LoginController(utenteDAO);
 
-        // --- REPOSITORY COMPOSITE: COESISTENZA MYSQL E JSON ---
+        // --- REPOSITORY STATUS ANIMATORE (persistenza + composite) ---
         StatusAnimatoreRepository statusAnimatoreRepo;
         try {
             statusAnimatoreRepo = RepositoryFactory.getInstance()
-                    .getDoublePersistenceStatusAnimatoreRepository(conn, jsonFile); // composite!
+                    .getDoublePersistenceStatusAnimatoreRepository(conn, jsonFile);
         } catch (DaoException de) {
             System.out.println("Errore nell'inizializzare la persistenza animatore: " + de.getMessage());
             try { conn.close(); } catch (Exception ex) {}
             return;
         }
 
-        AnimatoreController animatoreController = new AnimatoreController(statusAnimatoreRepo);
+        // --- VIEW PRINCIPALI ---
+        AziendaView aziendaView = new AziendaView(aziendaDAO);
+        LoginView loginView = new LoginView(loginController);
+        RegistrazioneView registrazioneView = new RegistrazioneView(loginController, aziendaDAO);
 
         // --- WIZARD INIZIALE (se serve) ---
         try {
@@ -72,7 +92,7 @@ public class Main {
             return;
         }
 
-        // --- SCELTA UTENTE: CONSOLE o GUI ---
+        // --- SCELTA INTERFACCIA ---
         System.out.println("--- Gestionale Animazione ---");
         System.out.println("1 - Interfaccia Grafica (JavaFX)");
         System.out.println("2 - Riga di comando (console)");
@@ -83,16 +103,14 @@ public class Main {
             EntryPointViewFX.aziendaDAO = aziendaDAO;
             EntryPointViewFX.utenteDAO = utenteDAO;
             EntryPointViewFX.loginController = loginController;
-            EntryPointViewFX.disponibilitaAnimatoreDAO = disponibilitaAnimatoreDAO;
-            EntryPointViewFX.statusAnimatoreDAO = statusAnimatoreDAO;
+            EntryPointViewFX.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
+            EntryPointViewFX.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
+            EntryPointViewFX.modificaDisponibilitaDAO = modificaDisponibilitaDAO;
+            EntryPointViewFX.eliminaDisponibilitaDAO = eliminaDisponibilitaDAO;
             EntryPointViewFX.offertaLavoroDAO = offertaLavoroDAO;
-            EntryPointViewFX.animatoreController = animatoreController;
-            javafx.application.Application.launch(EntryPointViewFX.class);
+            EntryPointViewFX.launch(EntryPointViewFX.class, args);
+            return;
         } else if ("2".equals(scelta)) {
-            AziendaView aziendaView = new AziendaView(aziendaDAO);
-            LoginView loginView = new LoginView(loginController);
-            RegistrazioneView registrazioneView = new RegistrazioneView(loginController, aziendaDAO);
-
             while (true) {
                 System.out.println("\n--- MENU PRINCIPALE ---");
                 System.out.println("1. Login");
@@ -103,34 +121,47 @@ public class Main {
 
                 switch (sceltaMenu) {
                     case "1": {
-                        Utente utente = loginView.doLoginReturnUtente();
+                        UtenteBean utente = loginView.doLoginReturnUtente();
                         if (utente != null) {
                             String aziendaNome = "(azienda sconosciuta)";
                             try {
                                 if (utente.getAziendaNome() != null && !utente.getAziendaNome().isEmpty()) {
                                     aziendaNome = utente.getAziendaNome();
                                 } else {
-                                    Azienda azienda = aziendaDAO.findById(utente.getAziendaId());
+                                    AziendaBean azienda = aziendaDAO.findById(utente.getAziendaId());
                                     if (azienda != null) aziendaNome = azienda.getNome();
                                 }
                             } catch (Exception e) {
                                 aziendaNome = "(errore azienda)";
                             }
 
-                            if (utente.getRuolo() == Utente.Ruolo.SUPERADMIN) {
+                            if (utente.getRuolo() == UtenteBean.Ruolo.SUPERADMIN) {
                                 System.out.println("Login effettuato! Benvenuto " + utente.getRuolo() + " di " + aziendaNome);
                                 SuperadminConsoleMenu.showMenu(utente, aziendaView, scan);
-                            } else if (utente.getRuolo() == Utente.Ruolo.AMMINISTRATORE) {
+                            } else if (utente.getRuolo() == UtenteBean.Ruolo.AMMINISTRATORE) {
                                 System.out.println("Login effettuato! Benvenuto " + utente.getRuolo() + " di " + aziendaNome);
                                 AdminMenuConsoleView adminMenu = new AdminMenuConsoleView(aziendaDAO, utente);
                                 adminMenu.showMenu();
-                            } else if (utente.getRuolo() == Utente.Ruolo.ANIMATORE) {
+                            } else if (utente.getRuolo() == UtenteBean.Ruolo.ANIMATORE) {
                                 System.out.println("Login effettuato! Benvenuto " + utente.getRuolo() + " di " + aziendaNome);
+
+                                CalendarioDisponibilitaAnimatoreController calendarioController =
+                                        new CalendarioDisponibilitaAnimatoreController(
+                                                visualizzaDisponibilitaDAO,
+                                                inserisciDisponibilitaDAO,
+                                                modificaDisponibilitaDAO,
+                                                eliminaDisponibilitaDAO,
+                                                utente
+                                        );
+
+                                AnimatoreController animatoreController =
+                                        new AnimatoreController(statusAnimatoreRepo);
+
                                 AnimatoreMenuView animMenu = new AnimatoreMenuView(
-                                        disponibilitaAnimatoreDAO,
+                                        calendarioController,
                                         offertaLavoroDAO,
-                                        utente,
-                                        animatoreController
+                                        animatoreController,
+                                        utente
                                 );
                                 animMenu.showMenu();
                             }

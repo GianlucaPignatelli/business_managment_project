@@ -1,6 +1,6 @@
 package animazioneazienda.dao;
 
-import animazioneazienda.bean.Utente;
+import animazioneazienda.bean.UtenteBean;
 import java.sql.*;
 
 public class UtenteDAO {
@@ -10,7 +10,7 @@ public class UtenteDAO {
         this.conn = conn;
     }
 
-    public boolean insertUtente(Utente utente) throws SQLException {
+    public boolean insertUtente(UtenteBean utente) throws SQLException {
         String sql = "INSERT INTO utenti (email, password, ruolo, azienda_id, nome, cognome, sesso, data_nascita) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, utente.getEmail());
@@ -30,7 +30,7 @@ public class UtenteDAO {
     }
 
     // Ricerca utente per login e popola tutti i campi
-    public Utente findByEmailAndPassword(String email, String password) throws SQLException {
+    public UtenteBean findByEmailAndPassword(String email, String password) throws SQLException {
         String sql = "SELECT u.*, a.nome AS azienda_nome " +
                 "FROM utenti u LEFT JOIN aziende a ON u.azienda_id = a.id " +
                 "WHERE u.email = ? AND u.password = ?";
@@ -39,11 +39,11 @@ public class UtenteDAO {
             stmt.setString(2, password);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                Utente utente = new Utente();
+                UtenteBean utente = new UtenteBean();
                 utente.setId(rs.getInt("id"));
                 utente.setEmail(rs.getString("email"));
                 utente.setPassword(rs.getString("password"));
-                utente.setRuolo(Utente.Ruolo.valueOf(rs.getString("ruolo")));
+                utente.setRuolo(UtenteBean.Ruolo.valueOf(rs.getString("ruolo")));
                 utente.setAziendaId(rs.getInt("azienda_id"));
                 utente.setAziendaNome(rs.getString("azienda_nome"));
                 utente.setNome(rs.getString("nome"));
@@ -60,7 +60,7 @@ public class UtenteDAO {
     public int contaSuperadmin() throws SQLException {
         String sql = "SELECT COUNT(*) FROM utenti WHERE ruolo = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, Utente.Ruolo.SUPERADMIN.name());
+            stmt.setString(1, UtenteBean.Ruolo.SUPERADMIN.name());
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return rs.getInt(1);
