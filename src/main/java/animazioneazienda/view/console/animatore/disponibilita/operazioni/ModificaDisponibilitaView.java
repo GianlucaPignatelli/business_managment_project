@@ -1,4 +1,4 @@
-package animazioneazienda.view.console.animatore.disponibilita;
+package animazioneazienda.view.console.animatore.disponibilita.operazioni;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;

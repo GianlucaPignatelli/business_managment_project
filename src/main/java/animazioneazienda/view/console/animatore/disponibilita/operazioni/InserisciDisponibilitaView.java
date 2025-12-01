@@ -1,7 +1,6 @@
-package animazioneazienda.view.console.animatore.disponibilita;
+package animazioneazienda.view.console.animatore.disponibilita.operazioni;
 
 import animazioneazienda.bean.UtenteBean;
-import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
 import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
 import animazioneazienda.exception.DaoException;
 import java.time.LocalDate;

@@ -2,6 +2,10 @@ package animazioneazienda.view.FX.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.view.FX.animatore.disponibilita.operazioni.EliminaDisponibilitaViewFX;
+import animazioneazienda.view.FX.animatore.disponibilita.operazioni.InserisciDisponibilitaViewFX;
+import animazioneazienda.view.FX.animatore.disponibilita.operazioni.ModificaDisponibilitaViewFX;
+import animazioneazienda.view.FX.animatore.disponibilita.operazioni.VisualizzaDisponibilitaViewFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

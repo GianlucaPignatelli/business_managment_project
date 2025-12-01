@@ -2,6 +2,10 @@ package animazioneazienda.view.console.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.view.console.animatore.disponibilita.operazioni.EliminaDisponibilitaView;
+import animazioneazienda.view.console.animatore.disponibilita.operazioni.InserisciDisponibilitaView;
+import animazioneazienda.view.console.animatore.disponibilita.operazioni.ModificaDisponibilitaView;
+import animazioneazienda.view.console.animatore.disponibilita.operazioni.VisualizzaDisponibilitaView;
 
 import java.util.Scanner;
 

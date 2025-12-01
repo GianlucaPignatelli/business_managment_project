@@ -1,4 +1,4 @@
-package animazioneazienda.view.console.animatore;
+package animazioneazienda.view.console.animatore.status;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.StatusAnimatoreBean;

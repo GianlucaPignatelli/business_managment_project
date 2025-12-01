@@ -1,8 +1,9 @@
-package animazioneazienda.view.FX.animatore;
+package animazioneazienda.view.FX.animatore.offerte;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.OffertaLavoroBean;
 import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
+import animazioneazienda.view.FX.animatore.AnimatoreMenuFX;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;

@@ -6,6 +6,8 @@ import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
 import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
 import animazioneazienda.view.FX.EntryPointViewFX;
 import animazioneazienda.view.FX.animatore.disponibilita.CalendarioDisponibilitaViewFX;
+import animazioneazienda.view.FX.animatore.offerte.AnimatoreOfferteViewFX;
+import animazioneazienda.view.FX.animatore.status.AnimatoreStatusViewFX;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;

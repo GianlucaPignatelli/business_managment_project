@@ -1,9 +1,10 @@
-package animazioneazienda.view.FX.animatore;
+package animazioneazienda.view.FX.animatore.status;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.dao.animatore.status.StatusAnimatoreRepository;
 import animazioneazienda.exception.DaoException;
+import animazioneazienda.view.FX.animatore.AnimatoreMenuFX;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
