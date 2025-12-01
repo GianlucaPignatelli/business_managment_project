@@ -1,8 +1,9 @@
 package animazioneazienda.view.FX.animatore;
 
 import animazioneazienda.bean.UtenteBean;
-import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreRepository;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
 import animazioneazienda.view.FX.EntryPointViewFX;
 import animazioneazienda.view.FX.animatore.disponibilita.CalendarioDisponibilitaViewFX;
 import javafx.scene.Scene;
@@ -77,26 +78,23 @@ public class AnimatoreMenuFX {
         );
 
         statusBtn.setOnAction(ev -> {
-            StatusAnimatoreDAO statusDAO = EntryPointViewFX.statusAnimatoreDAO;
-            AnimatoreStatusViewFX statusView = new AnimatoreStatusViewFX(primaryStage, utente, statusDAO);
+            StatusAnimatoreRepository statusRepo = EntryPointViewFX.statusAnimatoreRepository;
+            AnimatoreStatusViewFX statusView = new AnimatoreStatusViewFX(primaryStage, utente, statusRepo);
             statusView.show();
         });
 
         offerteBtn.setOnAction(ev -> {
-            OffertaLavoroDAO offertaDAO = EntryPointViewFX.offertaLavoroDAO;
-            AnimatoreOfferteViewFX offerteView = new AnimatoreOfferteViewFX(primaryStage, utente, offertaDAO);
+            OffertaLavoroRepository offertaRepo = EntryPointViewFX.offertaLavoroRepository;
+            AnimatoreOfferteViewFX offerteView = new AnimatoreOfferteViewFX(primaryStage, utente, offertaRepo);
             offerteView.show();
         });
 
         disponibilitaBtn.setOnAction(ev -> {
-            // Recupera tutti e 4 i DAO modulari e passa al CalendarioDisponibilitaViewFX!
+            DisponibilitaAnimatoreRepository disponibilitaRepo = EntryPointViewFX.disponibilitaAnimatoreRepository;
             CalendarioDisponibilitaViewFX disponibilitaView = new CalendarioDisponibilitaViewFX(
                     primaryStage,
                     utente,
-                    EntryPointViewFX.visualizzaDisponibilitaDAO,
-                    EntryPointViewFX.inserisciDisponibilitaDAO,
-                    EntryPointViewFX.modificaDisponibilitaDAO,
-                    EntryPointViewFX.eliminaDisponibilitaDAO
+                    disponibilitaRepo
             );
             disponibilitaView.show();
         });

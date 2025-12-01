@@ -2,7 +2,7 @@ package animazioneazienda.view.FX.animatore;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.OffertaLavoroBean;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,9 +19,9 @@ import java.util.List;
 public class AnimatoreOfferteViewFX {
     private final Stage primaryStage;
     private final UtenteBean animatore;
-    private final OffertaLavoroDAO offertaDAO;
+    private final OffertaLavoroRepository offertaDAO;
 
-    public AnimatoreOfferteViewFX(Stage primaryStage, UtenteBean animatore, OffertaLavoroDAO offertaDAO) {
+    public AnimatoreOfferteViewFX(Stage primaryStage, UtenteBean animatore, OffertaLavoroRepository offertaDAO) {
         this.primaryStage = primaryStage;
         this.animatore = animatore;
         this.offertaDAO = offertaDAO;

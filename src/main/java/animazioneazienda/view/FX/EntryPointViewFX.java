@@ -1,15 +1,11 @@
 package animazioneazienda.view.FX;
 
-import animazioneazienda.controller.AnimatoreController;
-import animazioneazienda.controller.LoginController;
 import animazioneazienda.dao.AziendaDAO;
 import animazioneazienda.dao.UtenteDAO;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
-import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreRepository;
+import animazioneazienda.controller.LoginController;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -26,13 +22,9 @@ public class EntryPointViewFX extends Application {
     public static AziendaDAO aziendaDAO;
     public static UtenteDAO utenteDAO;
     public static LoginController loginController;
-    public static VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
-    public static InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
-    public static ModificaDisponibilitaDAO modificaDisponibilitaDAO;
-    public static EliminaDisponibilitaDAO eliminaDisponibilitaDAO;
-    public static StatusAnimatoreDAO statusAnimatoreDAO;
-    public static OffertaLavoroDAO offertaLavoroDAO;
-    public static AnimatoreController animatoreController;
+    public static DisponibilitaAnimatoreRepository disponibilitaAnimatoreRepository;
+    public static OffertaLavoroRepository offertaLavoroRepository;
+    public static StatusAnimatoreRepository statusAnimatoreRepository;
 
     @Override
     public void start(Stage primaryStage) throws Exception{

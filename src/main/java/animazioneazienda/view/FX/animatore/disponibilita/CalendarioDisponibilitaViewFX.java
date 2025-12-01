@@ -1,11 +1,7 @@
 package animazioneazienda.view.FX.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
-
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -21,27 +17,16 @@ import javafx.stage.Stage;
 public class CalendarioDisponibilitaViewFX {
     private final Stage primaryStage;
     private final UtenteBean utente;
-
-    // I nuovi DAO modulari
-    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
-    private final InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
-    private final ModificaDisponibilitaDAO modificaDisponibilitaDAO;
-    private final EliminaDisponibilitaDAO eliminaDisponibilitaDAO;
+    private final DisponibilitaAnimatoreRepository disponibilitaRepository;
 
     public CalendarioDisponibilitaViewFX(
             Stage primaryStage,
             UtenteBean utente,
-            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO,
-            InserisciDisponibilitaDAO inserisciDisponibilitaDAO,
-            ModificaDisponibilitaDAO modificaDisponibilitaDAO,
-            EliminaDisponibilitaDAO eliminaDisponibilitaDAO
+            DisponibilitaAnimatoreRepository disponibilitaRepository
     ) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
-        this.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
-        this.modificaDisponibilitaDAO = modificaDisponibilitaDAO;
-        this.eliminaDisponibilitaDAO = eliminaDisponibilitaDAO;
+        this.disponibilitaRepository = disponibilitaRepository;
     }
 
     public void show() {
@@ -58,10 +43,9 @@ public class CalendarioDisponibilitaViewFX {
         HBox titleBox = new HBox(title);
         titleBox.setAlignment(Pos.CENTER);
 
-        // Pulsanti con azioni specializzate
+        Button visualizzaBtn = buttonIcon("Visualizza Disponibilità", "/visualizza.png");
         Button inserisciBtn = buttonIcon("Inserisci Disponibilità", "/inserisci.png");
         Button modificaBtn = buttonIcon("Modifica Disponibilità", "/modifica.png");
-        Button visualizzaBtn = buttonIcon("Visualizza Disponibilità", "/visualizza.png");
         Button eliminaBtn = buttonIcon("Elimina Disponibilità", "/elimina.png");
 
         ImageView backIcon = new ImageView(new Image(getClass().getResourceAsStream("/left_arrow.png")));
@@ -71,18 +55,14 @@ public class CalendarioDisponibilitaViewFX {
         indietroBtn.setMinSize(40, 40);
         HBox boxIndietro = new HBox(indietroBtn);
         boxIndietro.setAlignment(Pos.CENTER);
-        boxIndietro.setPadding(new Insets(18,0,0,0));
+        boxIndietro.setPadding(new Insets(18, 0, 0, 0));
 
-        root.getChildren().addAll(titleBox, inserisciBtn, modificaBtn, visualizzaBtn, eliminaBtn, boxIndietro);
+        root.getChildren().addAll(titleBox, visualizzaBtn, inserisciBtn, modificaBtn, eliminaBtn, boxIndietro);
 
-        inserisciBtn.setOnAction(ev ->
-                new InserisciDisponibilitaViewFX(primaryStage, utente, inserisciDisponibilitaDAO, visualizzaDisponibilitaDAO).show());
-        modificaBtn.setOnAction(ev ->
-                new ModificaDisponibilitaViewFX(primaryStage, utente, modificaDisponibilitaDAO, visualizzaDisponibilitaDAO).show());
-        visualizzaBtn.setOnAction(ev ->
-                new VisualizzaDisponibilitaViewFX(primaryStage, utente, visualizzaDisponibilitaDAO).show());
-        eliminaBtn.setOnAction(ev ->
-                new EliminaDisponibilitaViewFX(primaryStage, utente, eliminaDisponibilitaDAO, visualizzaDisponibilitaDAO).show());
+        visualizzaBtn.setOnAction(ev -> new VisualizzaDisponibilitaViewFX(primaryStage, utente, disponibilitaRepository).show());
+        inserisciBtn.setOnAction(ev -> new InserisciDisponibilitaViewFX(primaryStage, utente, disponibilitaRepository).show());
+        modificaBtn.setOnAction(ev -> new ModificaDisponibilitaViewFX(primaryStage, utente, disponibilitaRepository).show());
+        eliminaBtn.setOnAction(ev -> new EliminaDisponibilitaViewFX(primaryStage, utente, disponibilitaRepository).show());
 
         indietroBtn.setOnAction(ev -> {
             new animazioneazienda.view.FX.animatore.AnimatoreMenuFX(primaryStage, utente).show();

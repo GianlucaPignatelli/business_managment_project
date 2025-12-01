@@ -2,7 +2,8 @@ package animazioneazienda.view.FX.animatore;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.StatusAnimatoreBean;
-import animazioneazienda.dao.animatore.StatusAnimatoreDAO;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreRepository;
+import animazioneazienda.exception.DaoException;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -14,29 +15,27 @@ import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.paint.Color;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.sql.SQLException;
 
 public class AnimatoreStatusViewFX {
     private final Stage primaryStage;
     private final UtenteBean utente;
-    private final StatusAnimatoreDAO statusAnimatoreDAO;
+    private final StatusAnimatoreRepository statusAnimatoreRepository;
 
-    public AnimatoreStatusViewFX(Stage primaryStage, UtenteBean utente, StatusAnimatoreDAO statusAnimatoreDAO) {
+    public AnimatoreStatusViewFX(Stage primaryStage, UtenteBean utente, StatusAnimatoreRepository statusAnimatoreRepository) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.statusAnimatoreDAO = statusAnimatoreDAO;
+        this.statusAnimatoreRepository = statusAnimatoreRepository;
     }
 
     public void show() {
         StatusAnimatoreBean status = null;
         try {
-            status = statusAnimatoreDAO.findByAnimatore(utente.getAziendaId(), utente.getId());
-        } catch (SQLException e) {
-            // Puoi stampare/loggare il messaggio di errore qui
+            status = statusAnimatoreRepository.findByAnimatore(utente.getAziendaId(), utente.getId());
+        } catch (DaoException e) {
+            System.out.println("Errore nel caricamento profilo: " + e.getMessage());
         }
         if (status == null) {
             showProfiloNonCreato();
@@ -126,7 +125,6 @@ public class AnimatoreStatusViewFX {
         possiediLabel.setFont(Font.font("Arial", 17));
         possiediLabel.setTextFill(Color.web("#1CA9E2"));
 
-        // Bottoni Sì/No centrati e grandi
         RadioButton siMacchina = new RadioButton("Sì");
         RadioButton noMacchina = new RadioButton("No");
         siMacchina.setStyle("-fx-font-size: 19px; -fx-text-fill: #1CA9E2;");
@@ -141,7 +139,6 @@ public class AnimatoreStatusViewFX {
         scelteMacchinaBox.setAlignment(Pos.CENTER);
         scelteMacchinaBox.setPadding(new Insets(2, 0, 16, 0));
 
-        // Modello e dimensione auto (blocco macchina)
         TextField modelloAuto = new TextField();
         modelloAuto.setPromptText("Modello Auto");
         modelloAuto.setMaxWidth(320); modelloAuto.setPrefHeight(36);
@@ -161,7 +158,6 @@ public class AnimatoreStatusViewFX {
         boxMacchina.setVisible(hasMacchina);
         boxMacchina.setManaged(hasMacchina);
 
-        // Toggle listener per SI/NO
         macchinaGroup.selectedToggleProperty().addListener((obs, old, selected) -> {
             boolean si = selected == siMacchina;
             boxMacchina.setVisible(si);
@@ -177,7 +173,6 @@ public class AnimatoreStatusViewFX {
             comboDimensione.setValue(status.getDimensioneAuto());
         }
 
-        // Gestione lavori accettati tramite CheckBox e CSV
         List<String> lavoriPossibili = Arrays.asList("Capoanimatore", "Aiutoanimatore", "Delivery", "Operatore carretti");
         List<CheckBox> cbLavori = new ArrayList<>();
         for (String ruolo : lavoriPossibili) {
@@ -188,7 +183,6 @@ public class AnimatoreStatusViewFX {
                 cb.setSelected(accettati.contains(ruolo));
             }
             if (ruolo.equals("Delivery")) {
-                // Delivery può essere spuntata SOLO se possiedi macchina
                 cb.disableProperty().bind(noMacchina.selectedProperty());
                 cb.visibleProperty().bind(siMacchina.selectedProperty());
                 cb.managedProperty().bind(siMacchina.selectedProperty());
@@ -199,7 +193,6 @@ public class AnimatoreStatusViewFX {
         CheckBox haccp = new CheckBox("Certificato HACCP");
         haccp.setStyle("-fx-text-fill: #1CA9E2");
 
-        // HACCP abilitato solo se Operatore carretti selezionato
         if (status != null) haccp.setSelected(status.isHaccp());
         haccp.setDisable(status != null && status.getLavoriAccettati() != null &&
                 !Arrays.asList(status.getLavoriAccettati().split(",")).contains("Operatore carretti"));
@@ -273,7 +266,6 @@ public class AnimatoreStatusViewFX {
             nuovoStatus.setLavoriAccettati(lavoriAccettatiCsv);
             nuovoStatus.setStato(statoValue);
 
-            // Salva HACCP SOLO se "Operatore carretti" è selezionato
             if (cbLavori.get(3).isSelected()) {
                 nuovoStatus.setHaccp(haccp.isSelected());
             } else {
@@ -286,9 +278,9 @@ public class AnimatoreStatusViewFX {
             }
 
             try {
-                boolean ok = statusAnimatoreDAO.insertOrUpdate(nuovoStatus);
+                boolean ok = statusAnimatoreRepository.insertOrUpdate(nuovoStatus);
                 messageLabel.setText(ok ? "Profilo aggiornato!" : "Errore aggiornamento!");
-            } catch (SQLException ex) {
+            } catch (DaoException ex) {
                 messageLabel.setText("Errore DB: " + ex.getMessage());
             }
         });

@@ -1,10 +1,13 @@
 package animazioneazienda.view.console.animatore;
 
 import animazioneazienda.bean.UtenteBean;
+import animazioneazienda.controller.animatore.AnimatoreDisponibilitaController;
+import animazioneazienda.controller.animatore.AnimatoreOffertaController;
+import animazioneazienda.controller.animatore.AnimatoreStatusController;
 import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
-import animazioneazienda.controller.animatore.CalendarioDisponibilitaAnimatoreController;
-import animazioneazienda.controller.AnimatoreController;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.bean.animatore.OffertaLavoroBean;
+import animazioneazienda.bean.animatore.StatusAnimatoreBean;
+import animazioneazienda.exception.DaoException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,21 +15,21 @@ import java.util.List;
 import java.util.Scanner;
 
 public class AnimatoreMenuView {
-    private final CalendarioDisponibilitaAnimatoreController calendarioController;
-    private final OffertaLavoroDAO offertaLavoroDAO;
-    private final AnimatoreController animatoreController;
+    private final AnimatoreDisponibilitaController disponibilitaController;
+    private final AnimatoreOffertaController animatoreOffertaController;
+    private final AnimatoreStatusController animatoreStatusController;
     private final UtenteBean animatore;
     private final Scanner scan;
 
     public AnimatoreMenuView(
-            CalendarioDisponibilitaAnimatoreController calendarioController,
-            OffertaLavoroDAO offertaLavoroDAO,
-            AnimatoreController animatoreController,
+            AnimatoreDisponibilitaController disponibilitaController,
+            AnimatoreOffertaController animatoreOffertaController,
+            AnimatoreStatusController animatoreStatusController,
             UtenteBean animatore
     ) {
-        this.calendarioController = calendarioController;
-        this.offertaLavoroDAO = offertaLavoroDAO;
-        this.animatoreController = animatoreController;
+        this.disponibilitaController = disponibilitaController;
+        this.animatoreOffertaController = animatoreOffertaController;
+        this.animatoreStatusController = animatoreStatusController;
         this.animatore = animatore;
         this.scan = new Scanner(System.in);
     }
@@ -49,12 +52,10 @@ public class AnimatoreMenuView {
                     showDisponibilitaSubMenu();
                     break;
                 case "2":
-                    GestioneOfferteAnimatoreView offerteView = new GestioneOfferteAnimatoreView(offertaLavoroDAO, animatore);
-                    offerteView.gestisciOfferteLavoro();
+                    gestisciOfferteLavoro();
                     break;
                 case "3":
-                    GestioneStatusAnimatoreView statusView = new GestioneStatusAnimatoreView(animatore, animatoreController);
-                    statusView.gestisciStatusAnimatore();
+                    gestisciStatusAnimatore();
                     break;
                 case "0":
                     System.out.println("Uscita dal menu animatore...");
@@ -100,21 +101,25 @@ public class AnimatoreMenuView {
     }
 
     private void visualizzaDisponibilita() {
-        List<DisponibilitaAnimatoreBean> lista = calendarioController.ottieniDisponibilita();
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna disponibilità presente.");
-        } else {
-            for (int i = 0; i < lista.size(); i++) {
-                DisponibilitaAnimatoreBean bean = lista.get(i);
-                System.out.printf("%d - %s %s %s-%s [id:%d]\n",
-                        i + 1,
-                        bean.getData(),
-                        bean.isTuttoIlGiorno() ? "(Tutto il giorno)" : "",
-                        bean.getOrarioInizio() != null ? bean.getOrarioInizio() : "",
-                        bean.getOrarioFine() != null ? bean.getOrarioFine() : "",
-                        bean.getId()
-                );
+        try {
+            List<DisponibilitaAnimatoreBean> lista = disponibilitaController.visualizzaDisponibilita();
+            if (lista.isEmpty()) {
+                System.out.println("Nessuna disponibilità presente.");
+            } else {
+                for (int i = 0; i < lista.size(); i++) {
+                    DisponibilitaAnimatoreBean bean = lista.get(i);
+                    System.out.printf("%d - %s %s %s-%s [id:%d]\n",
+                            i + 1,
+                            bean.getData(),
+                            bean.isTuttoIlGiorno() ? "(Tutto il giorno)" : "",
+                            bean.getOrarioInizio() != null ? bean.getOrarioInizio() : "",
+                            bean.getOrarioFine() != null ? bean.getOrarioFine() : "",
+                            bean.getId()
+                    );
+                }
             }
+        } catch (DaoException e) {
+            System.out.println("Errore visualizzazione disponibilità: " + e.getMessage());
         }
     }
 
@@ -131,7 +136,7 @@ public class AnimatoreMenuView {
                 System.out.print("Ora fine (HH:mm): ");
                 fine = LocalTime.parse(scan.nextLine());
             }
-            boolean res = calendarioController.inserisciDisponibilita(giorno, inizio, fine, tuttoIlGiorno);
+            boolean res = disponibilitaController.inserisciDisponibilita(giorno, inizio, fine, tuttoIlGiorno);
             System.out.println(res ? "Disponibilità inserita!" : "Errore nell'inserimento.");
         } catch (Exception e) {
             System.out.println("Dati non validi: " + e.getMessage());
@@ -139,13 +144,13 @@ public class AnimatoreMenuView {
     }
 
     private void modificaDisponibilita() {
-        List<DisponibilitaAnimatoreBean> lista = calendarioController.ottieniDisponibilita();
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna disponibilità da modificare.");
-            return;
-        }
-        visualizzaDisponibilita();
         try {
+            List<DisponibilitaAnimatoreBean> lista = disponibilitaController.visualizzaDisponibilita();
+            if (lista.isEmpty()) {
+                System.out.println("Nessuna disponibilità da modificare.");
+                return;
+            }
+            visualizzaDisponibilita();
             System.out.print("Seleziona disponibilità da modificare (numero): ");
             int idx = Integer.parseInt(scan.nextLine()) - 1;
             if (idx < 0 || idx >= lista.size()) throw new IndexOutOfBoundsException();
@@ -163,7 +168,7 @@ public class AnimatoreMenuView {
                 fine = LocalTime.parse(scan.nextLine());
             }
 
-            boolean res = calendarioController.modificaDisponibilita(bean, giorno, inizio, fine, tuttoIlGiorno);
+            boolean res = disponibilitaController.modificaDisponibilita(bean, giorno, inizio, fine, tuttoIlGiorno);
             System.out.println(res ? "Modifica riuscita!" : "Errore: verifica sovrapposizioni e dati.");
         } catch (Exception e) {
             System.out.println("Errore nella selezione/modifica: " + e.getMessage());
@@ -171,22 +176,138 @@ public class AnimatoreMenuView {
     }
 
     private void eliminaDisponibilita() {
-        List<DisponibilitaAnimatoreBean> lista = calendarioController.ottieniDisponibilita();
-        if (lista.isEmpty()) {
-            System.out.println("Nessuna disponibilità da eliminare.");
-            return;
-        }
-        visualizzaDisponibilita();
         try {
+            List<DisponibilitaAnimatoreBean> lista = disponibilitaController.visualizzaDisponibilita();
+            if (lista.isEmpty()) {
+                System.out.println("Nessuna disponibilità da eliminare.");
+                return;
+            }
+            visualizzaDisponibilita();
             System.out.print("Seleziona disponibilità da eliminare (numero): ");
             int idx = Integer.parseInt(scan.nextLine()) - 1;
             if (idx < 0 || idx >= lista.size()) throw new IndexOutOfBoundsException();
             DisponibilitaAnimatoreBean bean = lista.get(idx);
 
-            boolean res = calendarioController.eliminaDisponibilita(bean);
+            boolean res = disponibilitaController.eliminaDisponibilita(bean);
             System.out.println(res ? "Eliminata correttamente!" : "Errore eliminazione.");
         } catch (Exception e) {
             System.out.println("Errore selezione/eliminazione: " + e.getMessage());
+        }
+    }
+
+    private void gestisciOfferteLavoro() {
+        try {
+            List<OffertaLavoroBean> offerte = animatoreOffertaController.caricaOfferte(animatore.getAziendaId(), animatore.getId());
+            System.out.println("\n--- OFFERTE LAVORO RICEVUTE ---");
+            if (offerte.isEmpty()) {
+                System.out.println("Nessuna offerta ricevuta.");
+                return;
+            }
+            for (OffertaLavoroBean o : offerte) {
+                System.out.println("ID Offerta: " + o.getId() +
+                        " | Data evento: " + o.getDataEvento() +
+                        " | Fascia: " + o.getOrarioInizio() + "-" + o.getOrarioFine() +
+                        " | Descrizione: " + o.getDescrizione() +
+                        " | Stato: " + o.getStato());
+            }
+            System.out.print("\nVuoi aggiornare lo stato di una offerta? (s/n): ");
+            if (scan.nextLine().trim().equalsIgnoreCase("s")) {
+                System.out.print("ID offerta da aggiornare: ");
+                int id = Integer.parseInt(scan.nextLine());
+                OffertaLavoroBean selezionata = offerte.stream().filter(o -> o.getId() == id).findFirst().orElse(null);
+                if (selezionata == null) {
+                    System.out.println("ID offerta non valido.");
+                    return;
+                }
+                System.out.print("Nuovo stato (accettato/rifiutato): ");
+                String nuovoStato = scan.nextLine().trim().toLowerCase();
+                if ("accettato".equals(nuovoStato) || "rifiutato".equals(nuovoStato)) {
+                    boolean ok = animatoreOffertaController.aggiornaStato(id, nuovoStato, animatore.getAziendaId(), animatore.getId());
+                    if (ok) {
+                        System.out.println("Stato offerta aggiornato!");
+                    } else {
+                        System.out.println("Errore nell'aggiornamento stato.");
+                    }
+                } else {
+                    System.out.println("Stato non valido!");
+                }
+            }
+        } catch (DaoException | RuntimeException e) {
+            System.out.println("Errore: " + e.getMessage());
+        }
+    }
+
+    private void gestisciStatusAnimatore() {
+        try {
+            StatusAnimatoreBean currStatus = animatoreStatusController.caricaStatus(animatore.getAziendaId(), animatore.getId());
+            System.out.println("\n--- IL TUO PROFILO ---");
+            if (currStatus != null) {
+                System.out.println("Modello auto: " + currStatus.getModelloAuto());
+                System.out.println("Dimensione auto: " + currStatus.getDimensioneAuto());
+                System.out.println("Tipologie lavori accettati: " + currStatus.getLavoriAccettati());
+                System.out.println("Certificazione HACCP: " + (currStatus.isHaccp() ? "Sì" : "No"));
+                System.out.println("Stato: " + currStatus.getStato());
+            } else {
+                System.out.println("Nessun profilo registrato!");
+            }
+            System.out.println("\n--- AGGIORNA DATI PROFILO ---");
+
+            System.out.print("Modello auto: ");
+            String modelloAuto = scan.nextLine();
+
+            System.out.print("Dimensione auto (piccola/media/grande/furgone): ");
+            String dimensioneAuto = scan.nextLine();
+
+            String[] elencoRuoli = {
+                    "Capoanimatore",
+                    "Aiutoanimatore",
+                    "Delivery",
+                    "Operatore carretti"
+            };
+            System.out.println("Seleziona i ruoli desiderati (numeri separati da virgola):");
+            for (int i = 0; i < elencoRuoli.length; i++) {
+                System.out.printf("%d. %s%n", i + 1, elencoRuoli[i]);
+            }
+            System.out.print("Scelta: ");
+            String input = scan.nextLine();
+            String[] scelte = input.split(",");
+            StringBuilder ruoliSelezionati = new StringBuilder();
+            boolean haccp = false;
+            for (String s : scelte) {
+                try {
+                    int idx = Integer.parseInt(s.trim()) - 1;
+                    if (idx >= 0 && idx < elencoRuoli.length) {
+                        String ruolo = elencoRuoli[idx];
+                        if (ruoliSelezionati.length() > 0) ruoliSelezionati.append(",");
+                        ruoliSelezionati.append(ruolo);
+                        if ("Operatore carretti".equals(ruolo)) {
+                            System.out.print("Hai la certificazione HACCP? (s/n): ");
+                            String val = scan.nextLine().trim().toLowerCase();
+                            haccp = val.equals("s");
+                        }
+                    }
+                } catch (NumberFormatException ignored) {}
+            }
+            System.out.print("Stato (Disponibile/Non operativo): ");
+            String stato = scan.nextLine();
+
+            StatusAnimatoreBean s = new StatusAnimatoreBean();
+            s.setAnimatoreId(animatore.getId());
+            s.setAziendaId(animatore.getAziendaId());
+            s.setModelloAuto(modelloAuto);
+            s.setDimensioneAuto(dimensioneAuto);
+            s.setLavoriAccettati(ruoliSelezionati.toString());
+            s.setStato(stato);
+            s.setHaccp(haccp);
+
+            boolean ok = animatoreStatusController.salvaOAggiornaStatus(s);
+            if (ok) {
+                System.out.println("Profilo aggiornato!");
+            } else {
+                System.out.println("Errore nell'aggiornamento profilo.");
+            }
+        } catch (DaoException | RuntimeException e) {
+            System.out.println("Errore: " + e.getMessage());
         }
     }
 }

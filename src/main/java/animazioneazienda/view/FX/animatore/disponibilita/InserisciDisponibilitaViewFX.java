@@ -2,8 +2,9 @@ package animazioneazienda.view.FX.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
-import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.exception.DaoException;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -13,7 +14,6 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 import java.time.LocalDate;
@@ -22,15 +22,12 @@ import java.time.LocalTime;
 public class InserisciDisponibilitaViewFX {
     private final Stage primaryStage;
     private final UtenteBean utente;
-    private final InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
-    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    private final DisponibilitaAnimatoreRepository disponibilitaRepository;
 
-    public InserisciDisponibilitaViewFX(Stage primaryStage, UtenteBean utente,
-                                        InserisciDisponibilitaDAO inserisciDisponibilitaDAO, VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO) {
+    public InserisciDisponibilitaViewFX(Stage primaryStage, UtenteBean utente, DisponibilitaAnimatoreRepository disponibilitaRepository) {
         this.primaryStage = primaryStage;
         this.utente = utente;
-        this.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
-        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
+        this.disponibilitaRepository = disponibilitaRepository;
     }
 
     public void show() {
@@ -41,7 +38,7 @@ public class InserisciDisponibilitaViewFX {
 
         Label titolo = new Label("Nuova Disponibilità");
         titolo.setFont(Font.font("Arial", 22));
-        titolo.setTextFill(Color.web("#1CA9E2"));
+        titolo.setStyle("-fx-text-fill: #1CA9E2;");
 
         DatePicker giornoPicker = new DatePicker();
         giornoPicker.setPromptText("Seleziona il giorno");
@@ -80,7 +77,7 @@ public class InserisciDisponibilitaViewFX {
         HBox boxIndietro = new HBox(indietro);
         boxIndietro.setAlignment(Pos.CENTER);
         boxIndietro.setPadding(new Insets(18,0,0,0));
-        Label esito = new Label(); esito.setTextFill(Color.web("#1CA9E2"));
+        Label esito = new Label(); esito.setStyle("-fx-text-fill: #1CA9E2;");
 
         conferma.setOnAction(ev -> {
             LocalDate giorno = giornoPicker.getValue();
@@ -103,11 +100,6 @@ public class InserisciDisponibilitaViewFX {
                     return;
                 }
             }
-            // >>> CONTROLLO SOVRAPPOSIZIONE DAL DAO CORRETTO
-            if (visualizzaDisponibilitaDAO.esisteSovrapposizione(utente.getAziendaId(), utente.getId(), giorno, inizio, fine, tuttoIlGiorno)) {
-                esito.setText("Disponibilità sovrapposta o già presente per quel giorno!");
-                return;
-            }
             DisponibilitaAnimatoreBean d = new DisponibilitaAnimatoreBean();
             d.setAziendaId(utente.getAziendaId());
             d.setAnimatoreId(utente.getId());
@@ -115,21 +107,16 @@ public class InserisciDisponibilitaViewFX {
             d.setTuttoIlGiorno(tuttoIlGiorno);
             d.setOrarioInizio(inizio);
             d.setOrarioFine(fine);
-            boolean ok = inserisciDisponibilitaDAO.inserisci(d);
-            if (ok) esito.setText("Disponibilità aggiunta!");
-            else esito.setText("Errore nell'aggiunta");
+            try {
+                boolean ok = disponibilitaRepository.inserisciDisponibilita(utente.getAziendaId(), utente.getId(), giorno, inizio, fine, tuttoIlGiorno);
+                if (ok) esito.setText("Disponibilità aggiunta!");
+                else esito.setText("Errore nell'aggiunta");
+            } catch (DaoException ex) {
+                esito.setText("Errore: " + ex.getMessage());
+            }
         });
 
-        indietro.setOnAction(ev ->
-                new CalendarioDisponibilitaViewFX(
-                        primaryStage,
-                        utente,
-                        animazioneazienda.view.FX.EntryPointViewFX.visualizzaDisponibilitaDAO,
-                        animazioneazienda.view.FX.EntryPointViewFX.inserisciDisponibilitaDAO,
-                        animazioneazienda.view.FX.EntryPointViewFX.modificaDisponibilitaDAO,
-                        animazioneazienda.view.FX.EntryPointViewFX.eliminaDisponibilitaDAO
-                ).show()
-        );
+        indietro.setOnAction(ev -> new CalendarioDisponibilitaViewFX(primaryStage, utente, disponibilitaRepository).show());
 
         pane.getChildren().addAll(titolo, giornoPicker, new HBox(16, allDayBtn, fasciaBtn), boxOrario, conferma, boxIndietro, esito);
         primaryStage.setScene(new Scene(pane, 500, 430));

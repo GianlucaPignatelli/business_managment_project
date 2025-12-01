@@ -1,4 +1,4 @@
-package animazioneazienda.dao.animatore;
+package animazioneazienda.dao.animatore.status;
 
 import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.exception.DaoException;

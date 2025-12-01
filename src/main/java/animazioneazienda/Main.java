@@ -1,18 +1,24 @@
 package animazioneazienda;
 
 import animazioneazienda.controller.LoginController;
-import animazioneazienda.controller.AnimatoreController;
-import animazioneazienda.controller.animatore.CalendarioDisponibilitaAnimatoreController;
-
+import animazioneazienda.controller.animatore.AnimatoreDisponibilitaController;
+import animazioneazienda.controller.animatore.AnimatoreStatusController;
+import animazioneazienda.controller.animatore.AnimatoreOffertaController;
 import animazioneazienda.dao.AziendaDAO;
 import animazioneazienda.dao.RepositoryFactory;
 import animazioneazienda.dao.UtenteDAO;
-import animazioneazienda.dao.animatore.StatusAnimatoreRepository;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.EliminaDisponibilitaDAO;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreRepository;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreCompositeRepository;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreMySQLRepository;
+import animazioneazienda.dao.animatore.status.StatusAnimatoreDemoRepository;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroCompositeRepository;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroMySQLRepository;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroDemoRepository;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreCompositeRepository;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreMySQLRepository;
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreDemoRepository;
 import animazioneazienda.bean.AziendaBean;
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.exception.DaoException;
@@ -29,8 +35,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.io.File;
 import java.util.Scanner;
-
-import static animazioneazienda.view.FX.EntryPointViewFX.statusAnimatoreDAO;
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
@@ -51,29 +56,33 @@ public class Main {
         // --- Percorso locale file JSON ---
         File jsonFile = new File("animatori.json");
 
-        // --- ISTANZIA TUTTE LE DAO ---
+        // --- DAO PRINCIPALI ---
         AziendaDAO aziendaDAO = new AziendaDAO(conn);
         UtenteDAO utenteDAO = new UtenteDAO(conn);
 
-        VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO = new VisualizzaDisponibilitaDAO(conn);
-        InserisciDisponibilitaDAO inserisciDisponibilitaDAO = new InserisciDisponibilitaDAO(conn);
-        ModificaDisponibilitaDAO modificaDisponibilitaDAO = new ModificaDisponibilitaDAO(conn);
-        EliminaDisponibilitaDAO eliminaDisponibilitaDAO = new EliminaDisponibilitaDAO(conn);
+        // --- Disponibilità: repository composite GoF
+        DisponibilitaAnimatoreRepository disponibilitaAnimatoreRepository = new DisponibilitaAnimatoreCompositeRepository(
+                Arrays.asList(
+                        new DisponibilitaAnimatoreMySQLRepository(conn),
+                        new DisponibilitaAnimatoreDemoRepository()
+                        // puoi aggiungere qui anche la versione JSON se serve
+                ));
 
-        OffertaLavoroDAO offertaLavoroDAO = new OffertaLavoroDAO(conn);
+        // --- Offerte: repository composite GoF
+        OffertaLavoroRepository offertaLavoroRepository = new OffertaLavoroCompositeRepository(Arrays.asList(
+                new OffertaLavoroMySQLRepository(conn),
+                new OffertaLavoroDemoRepository()
+                // puoi aggiungere qui anche la versione JSON se serve
+        ));
+
+        // --- Status: repository composite GoF
+        StatusAnimatoreRepository statusAnimatoreRepository = new StatusAnimatoreCompositeRepository(Arrays.asList(
+                new StatusAnimatoreMySQLRepository(conn),
+                new StatusAnimatoreDemoRepository()
+                // puoi aggiungere qui anche la versione JSON se serve
+        ));
 
         LoginController loginController = new LoginController(utenteDAO);
-
-        // --- REPOSITORY STATUS ANIMATORE (persistenza + composite) ---
-        StatusAnimatoreRepository statusAnimatoreRepo;
-        try {
-            statusAnimatoreRepo = RepositoryFactory.getInstance()
-                    .getDoublePersistenceStatusAnimatoreRepository(conn, jsonFile);
-        } catch (DaoException de) {
-            System.out.println("Errore nell'inizializzare la persistenza animatore: " + de.getMessage());
-            try { conn.close(); } catch (Exception ex) {}
-            return;
-        }
 
         // --- VIEW PRINCIPALI ---
         AziendaView aziendaView = new AziendaView(aziendaDAO);
@@ -103,11 +112,9 @@ public class Main {
             EntryPointViewFX.aziendaDAO = aziendaDAO;
             EntryPointViewFX.utenteDAO = utenteDAO;
             EntryPointViewFX.loginController = loginController;
-            EntryPointViewFX.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
-            EntryPointViewFX.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
-            EntryPointViewFX.modificaDisponibilitaDAO = modificaDisponibilitaDAO;
-            EntryPointViewFX.eliminaDisponibilitaDAO = eliminaDisponibilitaDAO;
-            EntryPointViewFX.offertaLavoroDAO = offertaLavoroDAO;
+            EntryPointViewFX.disponibilitaAnimatoreRepository = disponibilitaAnimatoreRepository;
+            EntryPointViewFX.offertaLavoroRepository = offertaLavoroRepository;
+            EntryPointViewFX.statusAnimatoreRepository = statusAnimatoreRepository;
             EntryPointViewFX.launch(EntryPointViewFX.class, args);
             return;
         } else if ("2".equals(scelta)) {
@@ -145,22 +152,22 @@ public class Main {
                             } else if (utente.getRuolo() == UtenteBean.Ruolo.ANIMATORE) {
                                 System.out.println("Login effettuato! Benvenuto " + utente.getRuolo() + " di " + aziendaNome);
 
-                                CalendarioDisponibilitaAnimatoreController calendarioController =
-                                        new CalendarioDisponibilitaAnimatoreController(
-                                                visualizzaDisponibilitaDAO,
-                                                inserisciDisponibilitaDAO,
-                                                modificaDisponibilitaDAO,
-                                                eliminaDisponibilitaDAO,
+                                AnimatoreDisponibilitaController disponibilitaController =
+                                        new AnimatoreDisponibilitaController(
+                                                disponibilitaAnimatoreRepository,
                                                 utente
                                         );
 
-                                AnimatoreController animatoreController =
-                                        new AnimatoreController(statusAnimatoreRepo);
+                                AnimatoreStatusController animatoreStatusController =
+                                        new AnimatoreStatusController(statusAnimatoreRepository);
+
+                                AnimatoreOffertaController animatoreOffertaController =
+                                        new AnimatoreOffertaController(offertaLavoroRepository);
 
                                 AnimatoreMenuView animMenu = new AnimatoreMenuView(
-                                        calendarioController,
-                                        offertaLavoroDAO,
-                                        animatoreController,
+                                        disponibilitaController,
+                                        animatoreOffertaController,
+                                        animatoreStatusController,
                                         utente
                                 );
                                 animMenu.showMenu();

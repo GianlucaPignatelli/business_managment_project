@@ -2,16 +2,16 @@ package animazioneazienda.view.console.animatore;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.OffertaLavoroBean;
-import animazioneazienda.dao.animatore.OffertaLavoroDAO;
+import animazioneazienda.dao.animatore.offerta.OffertaLavoroRepository;
 import java.util.List;
 import java.util.Scanner;
 
 public class GestioneOfferteAnimatoreView {
-    private final OffertaLavoroDAO offertaDAO;
+    private final OffertaLavoroRepository offertaDAO;
     private final UtenteBean animatore;
     private final Scanner scanner = new Scanner(System.in);
 
-    public GestioneOfferteAnimatoreView(OffertaLavoroDAO offertaDAO, UtenteBean animatore) {
+    public GestioneOfferteAnimatoreView(OffertaLavoroRepository offertaDAO, UtenteBean animatore) {
         this.offertaDAO = offertaDAO;
         this.animatore = animatore;
     }

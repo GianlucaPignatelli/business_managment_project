@@ -2,23 +2,23 @@ package animazioneazienda.view.console.animatore;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.StatusAnimatoreBean;
-import animazioneazienda.controller.AnimatoreController;
+import animazioneazienda.controller.animatore.AnimatoreStatusController;
 import animazioneazienda.exception.DaoException;
 import java.util.*;
 
 public class GestioneStatusAnimatoreView {
     private final UtenteBean animatore;
-    private final AnimatoreController animatoreController;
+    private final AnimatoreStatusController animatoreStatusController;
     private final Scanner scanner = new Scanner(System.in);
 
-    public GestioneStatusAnimatoreView(UtenteBean animatore, AnimatoreController animatoreController) {
+    public GestioneStatusAnimatoreView(UtenteBean animatore, AnimatoreStatusController animatoreStatusController) {
         this.animatore = animatore;
-        this.animatoreController = animatoreController;
+        this.animatoreStatusController = animatoreStatusController;
     }
 
     public void gestisciStatusAnimatore() {
         try {
-            StatusAnimatoreBean currStatus = animatoreController.caricaStatus(animatore.getAziendaId(), animatore.getId());
+            StatusAnimatoreBean currStatus = animatoreStatusController.caricaStatus(animatore.getAziendaId(), animatore.getId());
             System.out.println("\n--- IL TUO PROFILO ---");
             if (currStatus != null) {
                 System.out.println("Modello auto: " + currStatus.getModelloAuto());
@@ -80,7 +80,7 @@ public class GestioneStatusAnimatoreView {
             s.setStato(stato);
             s.setHaccp(haccp);
 
-            boolean ok = animatoreController.salvaOAggiornaStatus(s);
+            boolean ok = animatoreStatusController.salvaOAggiornaStatus(s);
             if (ok) {
                 System.out.println("Profilo aggiornato!");
             } else {

@@ -2,22 +2,22 @@ package animazioneazienda.view.console.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
-
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.exception.DaoException;
 import java.util.List;
 
 public class VisualizzaDisponibilitaView {
-    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    private final DisponibilitaAnimatoreRepository disponibilitaRepository;
     private final UtenteBean animatore;
 
-    public VisualizzaDisponibilitaView(VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO, UtenteBean animatore) {
-        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
+    public VisualizzaDisponibilitaView(DisponibilitaAnimatoreRepository disponibilitaRepository, UtenteBean animatore) {
+        this.disponibilitaRepository = disponibilitaRepository;
         this.animatore = animatore;
     }
 
     public void visualizzaDisponibilita() {
         try {
-            List<DisponibilitaAnimatoreBean> lista = visualizzaDisponibilitaDAO.trovaPerAnimatore(animatore.getAziendaId(), animatore.getId());
+            List<DisponibilitaAnimatoreBean> lista = disponibilitaRepository.findByAnimatore(animatore.getAziendaId(), animatore.getId());
             System.out.println("\n--- Disponibilità inserite ---");
             if (lista.isEmpty()) {
                 System.out.println("Nessuna disponibilità inserita.");
@@ -31,7 +31,7 @@ public class VisualizzaDisponibilitaView {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (DaoException e) {
             System.out.println("Errore nella visualizzazione: " + e.getMessage());
         }
     }

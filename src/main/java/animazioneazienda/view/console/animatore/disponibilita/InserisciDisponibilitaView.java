@@ -2,26 +2,19 @@ package animazioneazienda.view.console.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
-import animazioneazienda.dao.animatore.disponibilita.InserisciDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
-
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.exception.DaoException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Scanner;
 
 public class InserisciDisponibilitaView {
-    private final InserisciDisponibilitaDAO inserisciDisponibilitaDAO;
-    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    private final DisponibilitaAnimatoreRepository disponibilitaRepository;
     private final UtenteBean animatore;
     private final Scanner scanner = new Scanner(System.in);
 
-    public InserisciDisponibilitaView(
-            InserisciDisponibilitaDAO inserisciDisponibilitaDAO,
-            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO,
-            UtenteBean animatore
-    ) {
-        this.inserisciDisponibilitaDAO = inserisciDisponibilitaDAO;
-        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
+    public InserisciDisponibilitaView(DisponibilitaAnimatoreRepository disponibilitaRepository, UtenteBean animatore) {
+        this.disponibilitaRepository = disponibilitaRepository;
         this.animatore = animatore;
     }
 
@@ -48,24 +41,21 @@ public class InserisciDisponibilitaView {
                     return;
                 }
             }
-            // CONTROLLO SOVRAPPOSIZIONE
-            if (visualizzaDisponibilitaDAO.esisteSovrapposizione(animatore.getAziendaId(), animatore.getId(), data, inizio, fine, tuttoIlGiorno)) {
-                System.out.println("Errore: Esiste già una disponibilità o una fascia sovrapposta per questa data!");
-                return;
-            }
-            DisponibilitaAnimatoreBean d = new DisponibilitaAnimatoreBean();
-            d.setAziendaId(animatore.getAziendaId());
-            d.setAnimatoreId(animatore.getId());
-            d.setData(data);
-            d.setTuttoIlGiorno(tuttoIlGiorno);
-            d.setOrarioInizio(inizio);
-            d.setOrarioFine(fine);
-            boolean ok = inserisciDisponibilitaDAO.inserisci(d);
+            boolean ok = disponibilitaRepository.inserisciDisponibilita(
+                    animatore.getAziendaId(),
+                    animatore.getId(),
+                    data,
+                    inizio,
+                    fine,
+                    tuttoIlGiorno
+            );
             if (ok) {
                 System.out.println("Disponibilità aggiunta!");
             } else {
                 System.out.println("Errore nell'aggiunta.");
             }
+        } catch (DaoException e) {
+            System.out.println("Errore inserimento disponibilità: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());
         }

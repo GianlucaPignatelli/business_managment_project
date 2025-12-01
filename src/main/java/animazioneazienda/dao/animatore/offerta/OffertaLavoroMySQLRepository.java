@@ -1,16 +1,19 @@
-package animazioneazienda.dao.animatore;
+package animazioneazienda.dao.animatore.offerta;
 
 import animazioneazienda.bean.animatore.OffertaLavoroBean;
+import animazioneazienda.exception.DaoException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class OffertaLavoroDAO {
+public class OffertaLavoroMySQLRepository implements OffertaLavoroRepository {
     private final Connection conn;
-    public OffertaLavoroDAO(Connection conn) {
+
+    public OffertaLavoroMySQLRepository(Connection conn) {
         this.conn = conn;
     }
-    public List<OffertaLavoroBean> findByAnimatore(int aziendaId, int animatoreId) throws SQLException {
+
+    @Override
+    public List<OffertaLavoroBean> findByAnimatore(int aziendaId, int animatoreId) throws DaoException {
         List<OffertaLavoroBean> lista = new ArrayList<>();
         String query = "SELECT * FROM offerta_lavoro WHERE azienda_id=? AND animatore_id=?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -29,11 +32,14 @@ public class OffertaLavoroDAO {
                 o.setStato(rs.getString("stato"));
                 lista.add(o);
             }
+        } catch (SQLException e) {
+            throw new DaoException("Errore SQL in findByAnimatore", e);
         }
         return lista;
     }
 
-    public boolean aggiornaStato(int offertaId, String nuovoStato, int aziendaId, int animatoreId) throws SQLException {
+    @Override
+    public boolean aggiornaStato(int offertaId, String nuovoStato, int aziendaId, int animatoreId) throws DaoException {
         String query = "UPDATE offerta_lavoro SET stato=? WHERE id=? AND azienda_id=? AND animatore_id=?";
         try (PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, nuovoStato);
@@ -41,6 +47,8 @@ public class OffertaLavoroDAO {
             stmt.setInt(3, aziendaId);
             stmt.setInt(4, animatoreId);
             return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DaoException("Errore SQL in aggiornaStato", e);
         }
     }
 }

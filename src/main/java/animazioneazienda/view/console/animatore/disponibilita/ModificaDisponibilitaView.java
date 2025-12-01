@@ -2,33 +2,26 @@ package animazioneazienda.view.console.animatore.disponibilita;
 
 import animazioneazienda.bean.UtenteBean;
 import animazioneazienda.bean.animatore.DisponibilitaAnimatoreBean;
-import animazioneazienda.dao.animatore.disponibilita.ModificaDisponibilitaDAO;
-import animazioneazienda.dao.animatore.disponibilita.VisualizzaDisponibilitaDAO;
-
+import animazioneazienda.dao.animatore.disponibilita.DisponibilitaAnimatoreRepository;
+import animazioneazienda.exception.DaoException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Scanner;
 
 public class ModificaDisponibilitaView {
-    private final ModificaDisponibilitaDAO modificaDisponibilitaDAO;
-    private final VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO;
+    private final DisponibilitaAnimatoreRepository disponibilitaRepository;
     private final UtenteBean animatore;
     private final Scanner scanner = new Scanner(System.in);
 
-    public ModificaDisponibilitaView(
-            ModificaDisponibilitaDAO modificaDisponibilitaDAO,
-            VisualizzaDisponibilitaDAO visualizzaDisponibilitaDAO,
-            UtenteBean animatore
-    ) {
-        this.modificaDisponibilitaDAO = modificaDisponibilitaDAO;
-        this.visualizzaDisponibilitaDAO = visualizzaDisponibilitaDAO;
+    public ModificaDisponibilitaView(DisponibilitaAnimatoreRepository disponibilitaRepository, UtenteBean animatore) {
+        this.disponibilitaRepository = disponibilitaRepository;
         this.animatore = animatore;
     }
 
     public void modificaDisponibilita() {
         try {
-            List<DisponibilitaAnimatoreBean> lista = visualizzaDisponibilitaDAO.trovaPerAnimatore(animatore.getAziendaId(), animatore.getId());
+            List<DisponibilitaAnimatoreBean> lista = disponibilitaRepository.findByAnimatore(animatore.getAziendaId(), animatore.getId());
             if (lista.isEmpty()) {
                 System.out.println("Nessuna disponibilità da modificare.");
                 return;
@@ -71,25 +64,19 @@ public class ModificaDisponibilitaView {
                     return;
                 }
             }
-            boolean cambiato = !old.getData().equals(data) ||
-                    old.isTuttoIlGiorno() != tuttoIlGiorno ||
-                    (old.getOrarioInizio() != null && !old.getOrarioInizio().equals(inizio)) ||
-                    (old.getOrarioFine() != null && !old.getOrarioFine().equals(fine));
-            if (cambiato && visualizzaDisponibilitaDAO.esisteSovrapposizione(animatore.getAziendaId(), animatore.getId(), data, inizio, fine, tuttoIlGiorno, old.getId())) {
-                System.out.println("Errore: Esiste già una disponibilità o una fascia sovrapposta per questa data!");
-                return;
-            }
             old.setData(data);
             old.setTuttoIlGiorno(tuttoIlGiorno);
             old.setOrarioInizio(inizio);
             old.setOrarioFine(fine);
 
-            boolean ok = modificaDisponibilitaDAO.modifica(old);
+            boolean ok = disponibilitaRepository.modificaDisponibilita(old, data, inizio, fine, tuttoIlGiorno);
             if (ok) {
                 System.out.println("Disponibilità aggiornata!");
             } else {
                 System.out.println("Errore nell'aggiornamento.");
             }
+        } catch (DaoException e) {
+            System.out.println("Errore modifica disponibilità: " + e.getMessage());
         } catch (Exception e) {
             System.out.println("Errore: " + e.getMessage());
         }
