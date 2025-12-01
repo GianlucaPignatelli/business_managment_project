@@ -4,10 +4,11 @@ import animazioneazienda.bean.animatore.StatusAnimatoreBean;
 import animazioneazienda.exception.DaoException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+//file registrato come 'animatori.json'
 
 public class StatusAnimatoreJsonRepository implements StatusAnimatoreRepository {
     private final File jsonFile;

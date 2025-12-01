@@ -45,8 +45,8 @@ public class DisponibilitaAnimatoreCompositeRepository implements DisponibilitaA
     public boolean eliminaDisponibilita(DisponibilitaAnimatoreBean bean) throws DaoException {
         for (DisponibilitaAnimatoreRepository repo : repositories) {
             boolean ok = repo.eliminaDisponibilita(bean);
-            if (ok) return true; // Se almeno uno la elimina, per la view va bene
+            if (ok) return true;
         }
-        return false; // Nessuno l'ha eliminata
+        return false;
     }
 }
